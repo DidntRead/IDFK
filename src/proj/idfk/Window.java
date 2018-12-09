@@ -48,6 +48,7 @@ public class Window implements Disposable {
 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, debug ? GLFW_TRUE : GLFW_FALSE);
 
@@ -256,9 +257,16 @@ public class Window implements Disposable {
         return ret;
     }
 
-    public void changeResolution(Resolution res) {
-        System.out.println(res.toString());
-        glfwSetWindowSize(handle, res.width, res.height);
+    public void applySettings(Config config) {
+        if (config.width != this.windowSize.x || config.height != this.windowSize.y) {
+            glfwSetWindowSize(handle, config.width, config.height);
+        }
+
+        if (config.vsync) {
+            glfwSwapInterval(1);
+        } else {
+            glfwSwapInterval(0);
+        }
     }
 
     public void registerCallbacks(Object o) {

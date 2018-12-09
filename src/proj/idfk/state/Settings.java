@@ -6,6 +6,7 @@ import org.lwjgl.nuklear.NkRect;
 import org.lwjgl.nuklear.NkVec2;
 import org.lwjgl.system.MemoryStack;
 import proj.idfk.Application;
+import proj.idfk.Config;
 import proj.idfk.callback.KeyCallback;
 import proj.idfk.render.MasterRenderer;
 import proj.idfk.util.Resolution;
@@ -43,6 +44,7 @@ public class Settings implements GameState, KeyCallback {
     @Override
     public void render(MasterRenderer renderer) {
         final NkContext ctx = renderer.getContext();
+        final Config config = app.getConfig();
         try (MemoryStack stack = MemoryStack.stackPush()) {
             NkRect rect = NkRect.mallocStack(stack);
             final Vector2i size = app.getWindow().getWindowSize();
@@ -55,7 +57,7 @@ public class Settings implements GameState, KeyCallback {
                 nk_layout_row(ctx, NK_DYNAMIC, 0, ratio);
                 {
                     String renderDistance = "";
-                    switch (app.getConfig().renderDistance) {
+                    switch (config.renderDistance) {
                         case 4:
                             renderDistance = "Near";
                             break;
@@ -71,9 +73,9 @@ public class Settings implements GameState, KeyCallback {
                     }
                     nk_spacing(ctx, 1);
                     if (nk_button_label(ctx, "RenderDistance: " + renderDistance)) {
-                        app.getConfig().renderDistance *= 2;
-                        if (app.getConfig().renderDistance > 32) {
-                            app.getConfig().renderDistance = 4;
+                        config.renderDistance *= 2;
+                        if (config.renderDistance > 32) {
+                            config.renderDistance = 4;
                         }
                     }
 
@@ -84,7 +86,8 @@ public class Settings implements GameState, KeyCallback {
                         nk_layout_row_dynamic(ctx, 25, 1);
                         for (Resolution res : resolutions) {
                             if (nk_combo_item_label(ctx, res.toString(), NK_TEXT_LEFT)) {
-                                app.getWindow().changeResolution(res);
+                                config.width = res.width;
+                                config.height = res.height;
                             }
                         }
                         nk_combo_end(ctx);
@@ -93,9 +96,9 @@ public class Settings implements GameState, KeyCallback {
                     IntBuffer vsync = stack.mallocInt(1);
                     IntBuffer fullscreen = stack.mallocInt(1);
                     FloatBuffer sensitivity = stack.mallocFloat(1);
-                    vsync.put(0, app.getConfig().vsync ? 0 : 1);
-                    fullscreen.put(0, app.getConfig().fullscreen ? 0 : 1);
-                    sensitivity.put(0, app.getConfig().sensitivity);
+                    vsync.put(0, config.vsync ? 0 : 1);
+                    fullscreen.put(0, config.fullscreen ? 0 : 1);
+                    sensitivity.put(0, config.sensitivity);
 
                     nk_checkbox_label(ctx, "Vsync: ", vsync);
                     nk_checkbox_label(ctx, "Fullscreen: ", fullscreen);
@@ -104,9 +107,11 @@ public class Settings implements GameState, KeyCallback {
                     nk_label(ctx, "Sensitivity:", NK_TEXT_LEFT);
                     nk_slider_float(ctx, 0.05f, sensitivity, 3f, 0.05f);
 
-                    app.getConfig().fullscreen = fullscreen.get(0) == 0;
-                    app.getConfig().vsync = vsync.get(0) == 0;
-                    app.getConfig().sensitivity = sensitivity.get(0);
+                    config.fullscreen = fullscreen.get(0) == 0;
+                    config.vsync = vsync.get(0) == 0;
+                    config.sensitivity = sensitivity.get(0);
+
+                    app.getWindow().applySettings(config);
                 }
             }
             nk_end(ctx);
