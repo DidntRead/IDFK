@@ -36,13 +36,14 @@ public class NuklearRenderer implements Disposable {
     private NkContext ctx;
     private NkBuffer cmds;
     private int vao, vbo, ebo;
-    private ByteBuffer vertexBuffer, elementBuffer;
     private NkConvertConfig convertConfig;
     private NkDrawNullTexture null_texture;
     private NuklearShader shader;
-    private HashMap<Integer, Long> textureHandles;
+    private final HashMap<Integer, Long> textureHandles;
     private NkBuffer vbuf, ebuf;
-    private Window window;
+    private final Window window;
+
+    @SuppressWarnings("FieldCanBeLocal")
     private ByteBuffer ttf;
 
     public static NkColor grey;
@@ -77,7 +78,7 @@ public class NuklearRenderer implements Disposable {
             shader.loadTextureHandle(textureHandles.get(cmd.texture().id()));
             glScissor(
                     (int)(cmd.clip_rect().x()),
-                    (int)((window.getWindowSize().y - (int)(cmd.clip_rect().y() + cmd.clip_rect().h()))),
+                    ((window.getWindowSize().y - (int)(cmd.clip_rect().y() + cmd.clip_rect().h()))),
                     (int)(cmd.clip_rect().w()),
                     (int)(cmd.clip_rect().h())
             );
@@ -130,6 +131,7 @@ public class NuklearRenderer implements Disposable {
                 IntBuffer channels = stack.mallocInt(1);
                 ByteBuffer img = STBImage.stbi_load_from_memory(imgBuf, width, height, channels, 4);
                 glTextureStorage2D(background, 1, GL_RGBA8, width.get(0), height.get(0));
+                assert img != null;
                 glTextureSubImage2D(background, 0, 0, 0, width.get(0), height.get(0), GL_RGBA, GL11C.GL_UNSIGNED_BYTE, img);
                 STBImage.stbi_image_free(img);
             }
@@ -188,8 +190,8 @@ public class NuklearRenderer implements Disposable {
         glNamedBufferStorage(vbo, 512 * 1024, flags);
         glNamedBufferStorage(ebo, 128 * 1024, flags);
 
-        vertexBuffer = glMapNamedBufferRange(vbo, 0, 512 * 1024, flags);
-        elementBuffer = glMapNamedBufferRange(ebo, 0, 128 * 1024, flags);
+        ByteBuffer vertexBuffer = glMapNamedBufferRange(vbo, 0, 512 * 1024, flags);
+        ByteBuffer elementBuffer = glMapNamedBufferRange(ebo, 0, 128 * 1024, flags);
 
         convertConfig = NkConvertConfig.create()
                 .vertex_layout(VERTEX_LAYOUT)
@@ -206,6 +208,7 @@ public class NuklearRenderer implements Disposable {
         vbuf = NkBuffer.create();
         ebuf = NkBuffer.create();
 
+        assert vertexBuffer != null && elementBuffer != null;
         nk_buffer_init_fixed(vbuf, vertexBuffer);
         nk_buffer_init_fixed(ebuf, elementBuffer);
     }

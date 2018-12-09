@@ -9,7 +9,7 @@ public class Timer {
      * Create a new timer
      */
     public Timer() {
-        lastTime = (float)glfwGetTime();
+        reset();
     }
 
     /**

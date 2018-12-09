@@ -5,7 +5,7 @@ import org.lwjgl.opengl.GL45;
 public abstract class Uniform {
     protected int location;
     protected int programID;
-    private String name;
+    private final String name;
 
     protected Uniform(String name) {
         this.name = name;

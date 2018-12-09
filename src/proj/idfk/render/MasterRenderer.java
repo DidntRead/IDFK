@@ -8,7 +8,7 @@ import proj.idfk.util.Disposable;
 import static org.lwjgl.opengl.GL45.*;
 
 public class MasterRenderer implements Disposable {
-    private NuklearRenderer nuklearRenderer;
+    private final NuklearRenderer nuklearRenderer;
 
     public MasterRenderer(Application app) {
         this.nuklearRenderer = new NuklearRenderer(app);

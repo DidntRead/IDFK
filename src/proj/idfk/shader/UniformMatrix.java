@@ -7,7 +7,7 @@ import org.lwjgl.opengl.GL45;
 import java.nio.FloatBuffer;
 
 public class UniformMatrix extends Uniform{
-    private static FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
+    private static final FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
 
     public UniformMatrix(String name) {
         super(name);

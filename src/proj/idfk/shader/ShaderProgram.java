@@ -8,7 +8,7 @@ import java.util.Scanner;
 import static org.lwjgl.opengl.GL45.*;
 
 public class ShaderProgram implements Disposable {
-    private int programID;
+    private final int programID;
 
     public ShaderProgram(String vertex, String fragment) {
         this.programID = glCreateProgram();
@@ -43,11 +43,10 @@ public class ShaderProgram implements Disposable {
     private int loadShaderProgram(String fileName, int type) {
         try (final InputStream in = ShaderProgram.class.getResourceAsStream("/shaders/" + fileName)) {
             Scanner scn = new Scanner(in);
-            String line;
             StringBuilder sb = new StringBuilder();
 
             while (scn.hasNext()) {
-                sb.append(scn.nextLine() + "\n");
+                sb.append(scn.nextLine()).append("\n");
             }
 
             scn.close();

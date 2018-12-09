@@ -18,12 +18,12 @@ import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 import static org.lwjgl.nuklear.Nuklear.*;
 
 public class NewWorld implements GameState, KeyCallback {
-    private Application app;
-    private SaveManager saveManager;
-    private ByteBuffer seed;
-    private ByteBuffer name;
-    private IntBuffer seedLength;
-    private IntBuffer nameLength;
+    private final Application app;
+    private final SaveManager saveManager;
+    private final ByteBuffer seed;
+    private final ByteBuffer name;
+    private final IntBuffer seedLength;
+    private final IntBuffer nameLength;
 
     public NewWorld(Application app, SaveManager saveManager) {
         this.app = app;

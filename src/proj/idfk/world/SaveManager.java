@@ -24,8 +24,9 @@ public class SaveManager {
                 saveDirectory = Paths.get(System.getProperty("user.home"), ".idfk", "saves");
                 break;
             default:
+                System.out.println("Unsupported platform: " + Platform.get().getName());
                 saveDirectory = null;
-                break;
+                return;
         }
 
         if (!Files.exists(saveDirectory)) {
@@ -38,9 +39,9 @@ public class SaveManager {
 
         worlds = new ArrayList<>();
         try {
-            Files.list(saveDirectory).forEach(path -> {
-                worlds.add(path.getFileName().toString().replace(".wld", ""));
-            });
+            Files.list(saveDirectory).forEach(path ->
+                worlds.add(path.getFileName().toString().replace(".wld", ""))
+            );
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -51,11 +52,16 @@ public class SaveManager {
     }
 
     public void loadWorld(int index) {
-
+        System.out.println("TODO IMPLEMENT");
     }
 
     public void newWorld(String name, String seed) {
+        System.out.println("TODO IMPLEMENT");
+    }
 
+    public void saveCurrent() {
+        current = null;
+        System.out.println("TODO IMPLEMENT");
     }
 
     public World getCurrentWorld() {

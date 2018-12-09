@@ -20,7 +20,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 import static org.lwjgl.nuklear.Nuklear.*;
 
 public class Settings implements GameState, KeyCallback {
-    private Application app;
+    private final Application app;
 
     public Settings(Application app) {
         this.app = app;
@@ -50,7 +50,7 @@ public class Settings implements GameState, KeyCallback {
             final Vector2i size = app.getWindow().getWindowSize();
             nk_begin(ctx, "Settings", nk_rect(0, 0, size.x, size.y, rect), 0);
             {
-                nk_layout_row_static(ctx, size.y / 2, (int) (size.x * 0.6f), 2);
+                nk_layout_row_static(ctx, size.y / 2f, (int) (size.x * 0.6f), 2);
 
                 float[] ratio = {0.2f, 0.6f, 0.2f};
                 final List<Resolution> resolutions = app.getWindow().getUsableResolutions();

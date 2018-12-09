@@ -10,7 +10,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 
 public class InGame implements GameState, KeyCallback {
-    private Application app;
+    private final Application app;
     private World world = null;
 
     public InGame(Application app, SaveManager saveManager) {
@@ -35,13 +35,6 @@ public class InGame implements GameState, KeyCallback {
     @Override
     public void render(MasterRenderer renderer) {
 
-    }
-
-    public void setWorld(World world) {
-        if (this.world != null) {
-            System.err.println("Attempt to set world again!");
-        }
-        this.world = world;
     }
 
     @Override

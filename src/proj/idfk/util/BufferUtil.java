@@ -1,7 +1,5 @@
 package proj.idfk.util;
 
-import org.lwjgl.BufferUtils;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -43,8 +41,8 @@ public class BufferUtil {
         if (Files.isReadable(path)) {
             try (SeekableByteChannel fc = Files.newByteChannel(path)) {
                 buffer = createByteBuffer((int)fc.size() + 1);
-                while (fc.read(buffer) != -1) {
-                    ;
+                while (true) {
+                    if (fc.read(buffer) == -1) break;
                 }
             }
         } else {

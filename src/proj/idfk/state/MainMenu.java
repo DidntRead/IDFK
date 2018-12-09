@@ -11,8 +11,7 @@ import static org.lwjgl.nuklear.Nuklear.*;
 
 public class MainMenu implements GameState {
     private static final float buttonRatio[] = {0.2f, 0.6f, 0.2f};
-    private Application app;
-    private NkContext ctx;
+    private final Application app;
 
     public MainMenu(Application app) {
         this.app = app;
@@ -38,7 +37,6 @@ public class MainMenu implements GameState {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             NkRect rect = NkRect.mallocStack(stack);
             final NkContext ctx = renderer.getContext();
-            this.ctx = ctx;
             final Vector2i size = app.getWindow().getWindowSize();
             ctx.style().button().text_background(NuklearRenderer.grey);
             NkStyleItem style = NkStyleItem.mallocStack(stack);

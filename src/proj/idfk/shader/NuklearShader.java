@@ -2,11 +2,9 @@ package proj.idfk.shader;
 
 import org.joml.Matrix4f;
 
-import java.nio.FloatBuffer;
-
 public class NuklearShader extends ShaderProgram {
-    private UniformMatrix projectionMat;
-    private UniformBindlessSampler textureSampler;
+    private final UniformMatrix projectionMat;
+    private final UniformBindlessSampler textureSampler;
 
     public NuklearShader() {
         super("nuklear.vert", "nuklear.frag");

@@ -11,7 +11,7 @@ public class Config {
     public boolean vsync;
     public boolean fullscreen;
 
-    private Preferences pref;
+    private final Preferences pref;
 
     public Config() {
         this.pref = Preferences.userNodeForPackage(Config.class);

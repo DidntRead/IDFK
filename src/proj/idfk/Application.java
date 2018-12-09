@@ -10,15 +10,14 @@ import java.lang.reflect.Field;
 
 public class Application implements Disposable {
     private boolean debug;
-    private String name;
-    private Config config;
-    private Window window;
-    private Timer deltaTimer;
-    private GameStateManager stateManager;
-    private MasterRenderer renderer;
-    private SaveManager saveManager;
-
-    private long profiler;
+    private final String name;
+    private final Config config;
+    private final Window window;
+    private final Timer deltaTimer;
+    private final GameStateManager stateManager;
+    private final MasterRenderer renderer;
+    @SuppressWarnings("FieldCanBeLocal")
+    private final SaveManager saveManager;
 
     public Application(String name, Config config) {
         // Debug

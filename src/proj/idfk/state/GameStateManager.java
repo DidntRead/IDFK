@@ -4,7 +4,6 @@ import proj.idfk.Application;
 import proj.idfk.Window;
 import proj.idfk.render.MasterRenderer;
 import proj.idfk.world.SaveManager;
-import proj.idfk.world.World;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -12,15 +11,16 @@ import java.util.Deque;
 public class GameStateManager {
     private boolean popState = false;
     private proj.idfk.state.GameState current;
-    private Deque<proj.idfk.state.GameState> stack;
-    private Window window;
+    private proj.idfk.state.GameState desired = null;
+    private final Deque<proj.idfk.state.GameState> stack;
+    private final Window window;
 
-    private MainMenu mainMenu;
-    private Settings settings;
-    private WorldSelector worldSelector;
-    private NewWorld newWorld;
-    private PauseMenu pauseMenu;
-    private InGame inGame;
+    private final MainMenu mainMenu;
+    private final Settings settings;
+    private final WorldSelector worldSelector;
+    private final NewWorld newWorld;
+    private final PauseMenu pauseMenu;
+    private final InGame inGame;
 
     public GameStateManager(Application app, SaveManager saveManager) {
         this.stack = new ArrayDeque<>();
@@ -52,6 +52,7 @@ public class GameStateManager {
             case NewWorld:
                 return newWorld;
         }
+        System.out.println("Unknown game state: " + gameState.getClass().getSimpleName());
         return null;
     }
 
@@ -67,6 +68,7 @@ public class GameStateManager {
         return stack.isEmpty();
     }
 
+    @SuppressWarnings("ConstantConditions")
     public void push(GameState newState) {
         proj.idfk.state.GameState state = instanceOf(newState);
         stack.push(state);
@@ -75,13 +77,27 @@ public class GameStateManager {
         System.out.println("New game state: " + state.getClass().getSimpleName());
     }
 
+    public void pop(GameState desired) {
+        this.popState = true;
+        this.desired = instanceOf(desired);
+    }
+
     public void pop() {
         this.popState = true;
     }
 
     public void signal() {
         if (popState) {
-            proj.idfk.state.GameState last = stack.pop();
+            proj.idfk.state.GameState last = null;
+            if (desired != null) {
+                while (stack.peek() != desired) {
+                    last = stack.pop();
+                }
+                desired = null;
+            } else {
+                last = stack.pop();
+            }
+
             popState = false;
             proj.idfk.state.GameState newState = stack.peek();
 
@@ -89,6 +105,7 @@ public class GameStateManager {
                 newState.on_enter();
                 window.registerCallbacks(newState);
                 current = newState;
+                assert stack.peek() != null;
                 System.out.println("Game state popped! New state: " + stack.peek().getClass().getSimpleName());
             } else {
                 System.out.println("Game state popped! No new state.");
@@ -103,6 +120,6 @@ public class GameStateManager {
     }
 
     public enum GameState {
-        MainMenu, Settings, WorldSelector, InGame, PauseMenu, NewWorld;
+        MainMenu, Settings, WorldSelector, InGame, PauseMenu, NewWorld
     }
 }

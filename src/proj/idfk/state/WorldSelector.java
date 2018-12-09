@@ -17,8 +17,8 @@ import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 import static org.lwjgl.nuklear.Nuklear.*;
 
 public class WorldSelector implements GameState, KeyCallback {
-    private Application app;
-    private SaveManager saveManager;
+    private final Application app;
+    private final SaveManager saveManager;
     private int selected = 0;
 
     public WorldSelector(Application app, SaveManager saveManager) {

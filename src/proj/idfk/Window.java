@@ -16,22 +16,23 @@ import java.nio.DoubleBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.nuklear.Nuklear.*;
 
 public class Window implements Disposable {
-    private long handle;
-    private Vector2i framebufferSize;
-    private Vector2i windowSize;
+    private final long handle;
+    private final Vector2i framebufferSize;
+    private final Vector2i windowSize;
 
     private CharCallback charCallback = null;
     private KeyCallback keyCallback = null;
     private ScrollCallback scrollCallback = null;
     private MouseButtonCallback mouseButtonCallback = null;
 
-    private DoubleBuffer x = MemoryUtil.memAllocDouble(1);
-    private DoubleBuffer y = MemoryUtil.memAllocDouble(1);
+    private final DoubleBuffer x = MemoryUtil.memAllocDouble(1);
+    private final DoubleBuffer y = MemoryUtil.memAllocDouble(1);
 
     private NkContext ctx = null;
 
@@ -245,7 +246,7 @@ public class Window implements Disposable {
         List<Resolution> ret = new ArrayList<>();
 
         GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        final int width = vidMode.width();
+        final int width = Objects.requireNonNull(vidMode).width();
         final int height = vidMode.height();
 
         for (Resolution res : resolutions) {
