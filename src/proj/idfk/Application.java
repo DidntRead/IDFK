@@ -4,6 +4,7 @@ import proj.idfk.render.MasterRenderer;
 import proj.idfk.state.GameStateManager;
 import proj.idfk.util.Disposable;
 import proj.idfk.util.Timer;
+import proj.idfk.world.SaveManager;
 
 import java.lang.reflect.Field;
 
@@ -15,6 +16,7 @@ public class Application implements Disposable {
     private Timer deltaTimer;
     private GameStateManager stateManager;
     private MasterRenderer renderer;
+    private SaveManager saveManager;
 
     private long profiler;
 
@@ -30,8 +32,9 @@ public class Application implements Disposable {
         this.config = config;
         this.window = new Window(name, config, debug);
         this.deltaTimer = new Timer();
-        this.stateManager = new GameStateManager(this);
         this.renderer = new MasterRenderer(this);
+        this.saveManager = new SaveManager();
+        this.stateManager = new GameStateManager(this, saveManager);
     }
 
     public void mainLoop() {

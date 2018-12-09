@@ -3,6 +3,8 @@ package proj.idfk.state;
 import proj.idfk.Application;
 import proj.idfk.Window;
 import proj.idfk.render.MasterRenderer;
+import proj.idfk.world.SaveManager;
+import proj.idfk.world.World;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -15,13 +17,21 @@ public class GameStateManager {
 
     private MainMenu mainMenu;
     private Settings settings;
+    private WorldSelector worldSelector;
+    private NewWorld newWorld;
+    private PauseMenu pauseMenu;
+    private InGame inGame;
 
-    public GameStateManager(Application app) {
+    public GameStateManager(Application app, SaveManager saveManager) {
         this.stack = new ArrayDeque<>();
         this.window = app.getWindow();
 
         this.mainMenu = new MainMenu(app);
         this.settings = new Settings(app);
+        this.worldSelector = new WorldSelector(app, saveManager);
+        this.newWorld = new NewWorld(app, saveManager);
+        this.inGame = new InGame(app, saveManager);
+        this.pauseMenu = new PauseMenu(app, saveManager);
 
         push(GameState.MainMenu);
         signal();
@@ -30,15 +40,17 @@ public class GameStateManager {
     private proj.idfk.state.GameState instanceOf(GameState gameState) {
         switch (gameState) {
             case InGame:
-                return null;
+                return inGame;
             case MainMenu:
                 return mainMenu;
             case PauseMenu:
-                return null;
+                return pauseMenu;
             case Settings:
                 return settings;
             case WorldSelector:
-                return null;
+                return worldSelector;
+            case NewWorld:
+                return newWorld;
         }
         return null;
     }
@@ -91,6 +103,6 @@ public class GameStateManager {
     }
 
     public enum GameState {
-        MainMenu, Settings, WorldSelector, InGame, PauseMenu
+        MainMenu, Settings, WorldSelector, InGame, PauseMenu, NewWorld;
     }
 }

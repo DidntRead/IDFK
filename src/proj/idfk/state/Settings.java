@@ -6,6 +6,7 @@ import org.lwjgl.nuklear.NkRect;
 import org.lwjgl.nuklear.NkVec2;
 import org.lwjgl.system.MemoryStack;
 import proj.idfk.Application;
+import proj.idfk.callback.KeyCallback;
 import proj.idfk.render.MasterRenderer;
 import proj.idfk.util.Resolution;
 
@@ -13,9 +14,11 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.List;
 
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
+import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 import static org.lwjgl.nuklear.Nuklear.*;
 
-public class Settings implements GameState {
+public class Settings implements GameState, KeyCallback {
     private Application app;
 
     public Settings(Application app) {
@@ -107,6 +110,13 @@ public class Settings implements GameState {
                 }
             }
             nk_end(ctx);
+        }
+    }
+
+    @Override
+    public void keyCallback(int key, int action, int modifiers) {
+        if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+            app.getStateManager().pop();
         }
     }
 }
