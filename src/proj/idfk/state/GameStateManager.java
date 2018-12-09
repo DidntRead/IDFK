@@ -14,12 +14,14 @@ public class GameStateManager {
     private Window window;
 
     private MainMenu mainMenu;
+    private Settings settings;
 
     public GameStateManager(Application app) {
         this.stack = new ArrayDeque<>();
         this.window = app.getWindow();
 
         this.mainMenu = new MainMenu(app);
+        this.settings = new Settings(app);
 
         push(GameState.MainMenu);
         signal();
@@ -34,7 +36,7 @@ public class GameStateManager {
             case PauseMenu:
                 return null;
             case Settings:
-                return null;
+                return settings;
             case WorldSelector:
                 return null;
         }

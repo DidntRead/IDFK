@@ -16,6 +16,8 @@ public class Application implements Disposable {
     private GameStateManager stateManager;
     private MasterRenderer renderer;
 
+    private long profiler;
+
     public Application(String name, Config config) {
         // Debug
         try {
@@ -29,7 +31,7 @@ public class Application implements Disposable {
         this.window = new Window(name, config, debug);
         this.deltaTimer = new Timer();
         this.stateManager = new GameStateManager(this);
-        this.renderer = new MasterRenderer();
+        this.renderer = new MasterRenderer(this);
     }
 
     public void mainLoop() {
@@ -37,11 +39,15 @@ public class Application implements Disposable {
             float delta = deltaTimer.elapsed();
             measureDelta(delta);
 
+            renderer.beginInput();
             window.poll();
+            renderer.endInput();
 
             stateManager.update(delta);
 
             stateManager.render(renderer);
+
+            renderer.finish();
 
             window.display();
 
@@ -93,8 +99,17 @@ public class Application implements Disposable {
         return this.window;
     }
 
+    public GameStateManager getStateManager() {
+        return this.stateManager;
+    }
+
+    public Config getConfig() {
+        return this.config;
+    }
+
     @Override
     public void dispose() {
+        renderer.dispose();
         window.dispose();
         config.save();
     }

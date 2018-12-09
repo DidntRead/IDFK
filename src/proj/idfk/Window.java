@@ -2,17 +2,23 @@ package proj.idfk;
 
 import org.joml.Vector2i;
 import org.lwjgl.glfw.*;
+import org.lwjgl.nuklear.NkContext;
+import org.lwjgl.nuklear.NkVec2;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 import proj.idfk.callback.*;
 import proj.idfk.util.Disposable;
+import proj.idfk.util.Resolution;
 
 import java.nio.DoubleBuffer;
 import java.nio.IntBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.nuklear.Nuklear.*;
 
 public class Window implements Disposable {
     private long handle;
@@ -26,6 +32,8 @@ public class Window implements Disposable {
 
     private DoubleBuffer x = MemoryUtil.memAllocDouble(1);
     private DoubleBuffer y = MemoryUtil.memAllocDouble(1);
+
+    private NkContext ctx = null;
 
     public Window(String name, Config config) {
         this(name, config, false);
@@ -70,6 +78,9 @@ public class Window implements Disposable {
                 if (charCallback != null) {
                     charCallback.charCallback((char) codepoint);
                 }
+                if (ctx != null) {
+                    nk_input_unicode(ctx, codepoint);
+                }
             }
         });
 
@@ -78,6 +89,68 @@ public class Window implements Disposable {
             public void invoke(long window, int key, int scancode, int action, int mods) {
                 if (keyCallback != null) {
                     keyCallback.keyCallback(key, action, mods);
+                }
+                if (ctx != null) {
+                    boolean press = action == GLFW_PRESS;
+                    switch (key) {
+                        case GLFW_KEY_DELETE:
+                            nk_input_key(ctx, NK_KEY_DEL, press);
+                            break;
+                        case GLFW_KEY_ENTER:
+                            nk_input_key(ctx, NK_KEY_ENTER, press);
+                            break;
+                        case GLFW_KEY_TAB:
+                            nk_input_key(ctx, NK_KEY_TAB, press);
+                            break;
+                        case GLFW_KEY_BACKSPACE:
+                            nk_input_key(ctx, NK_KEY_BACKSPACE, press);
+                            break;
+                        case GLFW_KEY_UP:
+                            nk_input_key(ctx, NK_KEY_UP, press);
+                            break;
+                        case GLFW_KEY_DOWN:
+                            nk_input_key(ctx, NK_KEY_DOWN, press);
+                            break;
+                        case GLFW_KEY_HOME:
+                            nk_input_key(ctx, NK_KEY_TEXT_START, press);
+                            nk_input_key(ctx, NK_KEY_SCROLL_START, press);
+                            break;
+                        case GLFW_KEY_END:
+                            nk_input_key(ctx, NK_KEY_TEXT_END, press);
+                            nk_input_key(ctx, NK_KEY_SCROLL_END, press);
+                            break;
+                        case GLFW_KEY_PAGE_DOWN:
+                            nk_input_key(ctx, NK_KEY_SCROLL_DOWN, press);
+                            break;
+                        case GLFW_KEY_PAGE_UP:
+                            nk_input_key(ctx, NK_KEY_SCROLL_UP, press);
+                            break;
+                        case GLFW_KEY_LEFT_SHIFT:
+                        case GLFW_KEY_RIGHT_SHIFT:
+                            nk_input_key(ctx, NK_KEY_SHIFT, press);
+                            break;
+                        case GLFW_KEY_LEFT_CONTROL:
+                        case GLFW_KEY_RIGHT_CONTROL:
+                            if (press) {
+                                nk_input_key(ctx, NK_KEY_COPY, glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS);
+                                nk_input_key(ctx, NK_KEY_PASTE, glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS);
+                                nk_input_key(ctx, NK_KEY_CUT, glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS);
+                                nk_input_key(ctx, NK_KEY_TEXT_UNDO, glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS);
+                                nk_input_key(ctx, NK_KEY_TEXT_REDO, glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS);
+                                nk_input_key(ctx, NK_KEY_TEXT_WORD_LEFT, glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS);
+                                nk_input_key(ctx, NK_KEY_TEXT_WORD_RIGHT, glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS);
+                                nk_input_key(ctx, NK_KEY_TEXT_LINE_START, glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS);
+                                nk_input_key(ctx, NK_KEY_TEXT_LINE_END, glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS);
+                            } else {
+                                nk_input_key(ctx, NK_KEY_LEFT, glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS);
+                                nk_input_key(ctx, NK_KEY_RIGHT, glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS);
+                                nk_input_key(ctx, NK_KEY_COPY, false);
+                                nk_input_key(ctx, NK_KEY_PASTE, false);
+                                nk_input_key(ctx, NK_KEY_CUT, false);
+                                nk_input_key(ctx, NK_KEY_SHIFT, false);
+                            }
+                            break;
+                    }
                 }
             }
         });
@@ -88,6 +161,21 @@ public class Window implements Disposable {
                 if (scrollCallback != null) {
                     scrollCallback.scrollCallback((float) yoffset);
                 }
+                if (ctx != null) {
+                    try (MemoryStack stack = MemoryStack.stackPush()) {
+                        NkVec2 scroll = NkVec2.mallocStack(stack).x((float) xoffset).y((float) yoffset);
+                        nk_input_scroll(ctx, scroll);
+                    }
+                }
+            }
+        });
+
+        glfwSetCursorPosCallback(handle, new GLFWCursorPosCallback() {
+            @Override
+            public void invoke(long window, double xpos, double ypos) {
+                if (ctx != null) {
+                    nk_input_motion(ctx, (int) xpos, (int) ypos);
+                }
             }
         });
 
@@ -97,6 +185,21 @@ public class Window implements Disposable {
                 if (mouseButtonCallback != null) {
                     glfwGetCursorPos(handle, x, y);
                     mouseButtonCallback.mouseButtonCallback((int)x.get(0), (int)y.get(0), button, action == GLFW_PRESS);
+                }
+                if (ctx != null) {
+                    glfwGetCursorPos(handle, x, y);
+                    int nk_button;
+                    switch (button) {
+                        case GLFW_MOUSE_BUTTON_RIGHT:
+                            nk_button = NK_BUTTON_RIGHT;
+                            break;
+                        case GLFW_MOUSE_BUTTON_MIDDLE:
+                            nk_button = NK_BUTTON_MIDDLE;
+                            break;
+                        default:
+                            nk_button = NK_BUTTON_LEFT;
+                    }
+                    nk_input_button(ctx, nk_button, (int)x.get(0), (int)y.get(0), action == GLFW_PRESS);
                 }
             }
         });
@@ -116,6 +219,10 @@ public class Window implements Disposable {
         });
     }
 
+    public void setupNuklearContext(NkContext ctx) {
+        this.ctx = ctx;
+    }
+
     public boolean shouldClose() {
         return glfwWindowShouldClose(handle);
     }
@@ -130,6 +237,28 @@ public class Window implements Disposable {
 
     public void setTitle(String title) {
         glfwSetWindowTitle(handle, title);
+    }
+
+    public List<Resolution> getUsableResolutions() {
+        final Resolution[] resolutions = Resolution.values();
+        List<Resolution> ret = new ArrayList<>();
+
+        GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        final int width = vidMode.width();
+        final int height = vidMode.height();
+
+        for (Resolution res : resolutions) {
+            if (res.width <= width && res.height <= height) {
+                ret.add(res);
+            }
+        }
+
+        return ret;
+    }
+
+    public void changeResolution(Resolution res) {
+        System.out.println(res.toString());
+        glfwSetWindowSize(handle, res.width, res.height);
     }
 
     public void registerCallbacks(Object o) {
@@ -154,6 +283,10 @@ public class Window implements Disposable {
         keyCallback = null;
         scrollCallback = null;
         mouseButtonCallback = null;
+    }
+
+    public void setShouldClose() {
+        glfwSetWindowShouldClose(handle, true);
     }
 
     public Vector2i getWindowSize() {
