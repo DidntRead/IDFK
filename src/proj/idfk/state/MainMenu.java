@@ -10,7 +10,7 @@ import proj.idfk.render.NuklearRenderer;
 import static org.lwjgl.nuklear.Nuklear.*;
 
 public class MainMenu implements GameState {
-    private static final float buttonRatio[] = {0.2f, 0.6f, 0.2f};
+    private static final float[] buttonRatio = {0.2f, 0.6f, 0.2f};
     private final Application app;
 
     public MainMenu(Application app) {

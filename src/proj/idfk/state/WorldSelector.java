@@ -8,7 +8,7 @@ import org.lwjgl.system.MemoryStack;
 import proj.idfk.Application;
 import proj.idfk.callback.KeyCallback;
 import proj.idfk.render.MasterRenderer;
-import proj.idfk.world.SaveManager;
+import proj.idfk.world.save.SaveManager;
 
 import java.util.List;
 
@@ -48,8 +48,8 @@ public class WorldSelector implements GameState, KeyCallback {
             final Vector2i size = app.getWindow().getWindowSize();
             NkRect rect = NkRect.mallocStack(stack);
 
-            float ratio[] = {30, size.x - 100f, 50};
-            float ratio2[] = {30, (size.x - 100f) / 2f,(size.x - 100f) / 2f, 50};
+            float[] ratio = {30, size.x - 100f, 50};
+            float[] ratio2 = {30, (size.x - 100f) / 2f, (size.x - 100f) / 2f, 50};
             List<String> worlds = saveManager.getWorlds();
             NkListView worldsList = NkListView.mallocStack(stack);
 
@@ -75,8 +75,11 @@ public class WorldSelector implements GameState, KeyCallback {
                 {
                         nk_spacing(ctx, 1);
                         if (nk_button_label(ctx, "Play")) {
-                            saveManager.loadWorld(selected);
-                            app.getStateManager().push(GameStateManager.GameState.InGame);
+                            if (saveManager.loadWorld(selected)) {
+                                app.getStateManager().push(GameStateManager.GameState.InGame);
+                            } else {
+                                saveManager.removeWorld(selected);
+                            }
                         }
                         if (nk_button_label(ctx, "New")) {
                             app.getStateManager().push(GameStateManager.GameState.NewWorld);

@@ -9,6 +9,7 @@ import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 import static org.lwjgl.BufferUtils.createByteBuffer;
 
@@ -48,7 +49,7 @@ public class BufferUtil {
         } else {
             try (
                     InputStream source = BufferUtil.class.getClassLoader().getResourceAsStream(resource);
-                    ReadableByteChannel rbc = Channels.newChannel(source)
+                    ReadableByteChannel rbc = Channels.newChannel(Objects.requireNonNull(source))
             ) {
                 buffer = createByteBuffer(bufferSize);
 

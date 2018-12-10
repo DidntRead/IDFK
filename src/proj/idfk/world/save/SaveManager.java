@@ -1,6 +1,7 @@
-package proj.idfk.world;
+package proj.idfk.world.save;
 
 import org.lwjgl.system.Platform;
+import proj.idfk.world.World;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,6 +9,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.zip.CRC32C;
 
 public class SaveManager {
     public final Path saveDirectory;
@@ -51,17 +54,43 @@ public class SaveManager {
         return this.worlds;
     }
 
-    public void loadWorld(int index) {
-        System.out.println("TODO IMPLEMENT");
+    public void removeWorld(int index) {
+        try {
+            Files.deleteIfExists(saveDirectory.resolve(worlds.get(index) + ".wld"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean loadWorld(int index) {
+        SaveFile saveFile = new SaveFile(worlds.get(index), saveDirectory);
+        if (saveFile.isValid()) {
+            this.current = new World(saveFile.getName(), saveFile.getSeed());
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void newWorld(String name, String seed) {
-        System.out.println("TODO IMPLEMENT");
+        worlds.add(name);
+        long seedLong;
+        if (seed.length() != 0) {
+            CRC32C crc = new CRC32C();
+            crc.update(seed.getBytes());
+            seedLong = crc.getValue();
+        } else {
+            seedLong = ThreadLocalRandom.current().nextLong();
+        }
+        current = new World(name, seedLong);
+        saveCurrent();
     }
 
     public void saveCurrent() {
+        if (current != null) {
+            SaveFile.saveWorld(current, saveDirectory);
+        }
         current = null;
-        System.out.println("TODO IMPLEMENT");
     }
 
     public World getCurrentWorld() {

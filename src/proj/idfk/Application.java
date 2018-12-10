@@ -4,7 +4,7 @@ import proj.idfk.render.MasterRenderer;
 import proj.idfk.state.GameStateManager;
 import proj.idfk.util.Disposable;
 import proj.idfk.util.Timer;
-import proj.idfk.world.SaveManager;
+import proj.idfk.world.save.SaveManager;
 
 import java.lang.reflect.Field;
 
@@ -16,6 +16,7 @@ public class Application implements Disposable {
     private final Timer deltaTimer;
     private final GameStateManager stateManager;
     private final MasterRenderer renderer;
+    private final Camera camera;
     @SuppressWarnings("FieldCanBeLocal")
     private final SaveManager saveManager;
 
@@ -30,10 +31,11 @@ public class Application implements Disposable {
         this.name = name;
         this.config = config;
         this.window = new Window(name, config, debug);
-        this.deltaTimer = new Timer();
         this.renderer = new MasterRenderer(this);
         this.saveManager = new SaveManager();
         this.stateManager = new GameStateManager(this, saveManager);
+        this.camera = new Camera(config);
+        this.deltaTimer = new Timer();
     }
 
     public void mainLoop() {
@@ -48,6 +50,8 @@ public class Application implements Disposable {
             stateManager.update(delta);
 
             stateManager.render(renderer);
+
+            camera.update();
 
             renderer.finish();
 
@@ -107,6 +111,14 @@ public class Application implements Disposable {
 
     public Config getConfig() {
         return this.config;
+    }
+
+    public MasterRenderer getRenderer() {
+        return this.renderer;
+    }
+
+    public Camera getCamera() {
+        return this.camera;
     }
 
     @Override

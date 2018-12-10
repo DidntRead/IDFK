@@ -3,7 +3,7 @@ package proj.idfk.state;
 import proj.idfk.Application;
 import proj.idfk.Window;
 import proj.idfk.render.MasterRenderer;
-import proj.idfk.world.SaveManager;
+import proj.idfk.world.save.SaveManager;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -71,6 +71,10 @@ public class GameStateManager {
     @SuppressWarnings("ConstantConditions")
     public void push(GameState newState) {
         proj.idfk.state.GameState state = instanceOf(newState);
+        proj.idfk.state.GameState old = stack.peek();
+        if (old != null) {
+            old.on_exit();
+        }
         stack.push(state);
         state.on_enter();
         window.registerCallbacks(state);
@@ -101,6 +105,10 @@ public class GameStateManager {
             popState = false;
             proj.idfk.state.GameState newState = stack.peek();
 
+            if (last != null) {
+                last.on_exit();
+            }
+
             if (newState != null) {
                 newState.on_enter();
                 window.registerCallbacks(newState);
@@ -109,10 +117,6 @@ public class GameStateManager {
                 System.out.println("Game state popped! New state: " + stack.peek().getClass().getSimpleName());
             } else {
                 System.out.println("Game state popped! No new state.");
-            }
-
-            if (last != null) {
-                last.on_exit();
             }
         } else {
             current = stack.peek();

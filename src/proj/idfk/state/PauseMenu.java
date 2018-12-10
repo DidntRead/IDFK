@@ -7,7 +7,7 @@ import org.lwjgl.system.MemoryStack;
 import proj.idfk.Application;
 import proj.idfk.callback.KeyCallback;
 import proj.idfk.render.MasterRenderer;
-import proj.idfk.world.SaveManager;
+import proj.idfk.world.save.SaveManager;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;

@@ -202,8 +202,8 @@ public class NuklearRenderer implements Disposable {
                 .curve_segment_count(22)
                 .arc_segment_count(22)
                 .global_alpha(1.0f)
-                .shape_AA(NK_ANTI_ALIASING_ON)
-                .line_AA(NK_ANTI_ALIASING_ON);
+                .shape_AA(NK_ANTI_ALIASING_OFF)
+                .line_AA(NK_ANTI_ALIASING_OFF);
 
         vbuf = NkBuffer.create();
         ebuf = NkBuffer.create();

@@ -1,5 +1,6 @@
 package proj.idfk;
 
+import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.lwjgl.glfw.*;
 import org.lwjgl.nuklear.NkContext;
@@ -25,6 +26,7 @@ public class Window implements Disposable {
     private final long handle;
     private final Vector2i framebufferSize;
     private final Vector2i windowSize;
+    private final Vector2f cursorPosition;
 
     private CharCallback charCallback = null;
     private KeyCallback keyCallback = null;
@@ -35,6 +37,7 @@ public class Window implements Disposable {
     private final DoubleBuffer y = MemoryUtil.memAllocDouble(1);
 
     private NkContext ctx = null;
+    private NkContext backup = null;
 
     public Window(String name, Config config) {
         this(name, config, false);
@@ -72,6 +75,10 @@ public class Window implements Disposable {
             this.windowSize = new Vector2i(x.get(0), y.get(0));
             glfwGetFramebufferSize(handle, x, y);
             this.framebufferSize = new Vector2i(x.get(0), y.get(0));
+            DoubleBuffer mouseX = stack.callocDouble(1);
+            DoubleBuffer mouseY = stack.callocDouble(1);
+            glfwGetCursorPos(handle, mouseX, mouseY);
+            this.cursorPosition = new Vector2f((float)mouseX.get(0), (float)mouseY.get(0));
         }
 
         glfwSetCharCallback(handle, new GLFWCharCallback() {
@@ -178,6 +185,7 @@ public class Window implements Disposable {
                 if (ctx != null) {
                     nk_input_motion(ctx, (int) xpos, (int) ypos);
                 }
+                cursorPosition.set((float) xpos, (float) ypos);
             }
         });
 
@@ -294,6 +302,17 @@ public class Window implements Disposable {
         mouseButtonCallback = null;
     }
 
+    public void disableNuklearInput() {
+        backup = ctx;
+        ctx = null;
+    }
+
+    public void enableNuklearInput() {
+        ctx = backup;
+        System.out.println(ctx == null);
+        backup = null;
+    }
+
     public void setShouldClose() {
         glfwSetWindowShouldClose(handle, true);
     }
@@ -304,6 +323,10 @@ public class Window implements Disposable {
 
     public Vector2i getFramebufferSize() {
         return this.framebufferSize;
+    }
+
+    public Vector2f getCursorPosition() {
+        return this.cursorPosition;
     }
 
     @Override

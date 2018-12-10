@@ -8,7 +8,7 @@ import org.lwjgl.system.MemoryUtil;
 import proj.idfk.Application;
 import proj.idfk.callback.KeyCallback;
 import proj.idfk.render.MasterRenderer;
-import proj.idfk.world.SaveManager;
+import proj.idfk.world.save.SaveManager;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -79,7 +79,7 @@ public class NewWorld implements GameState, KeyCallback {
                     nk_spacing(ctx, 1);
                     if (nk_button_label(ctx, "Create")) {
                         saveManager.newWorld(MemoryUtil.memASCII(name, nameLength.get(0)), MemoryUtil.memASCII(seed, seedLength.get(0)));
-                        app.getStateManager().pop();
+                        app.getStateManager().push(GameStateManager.GameState.InGame);
                     }
                 }
             }
