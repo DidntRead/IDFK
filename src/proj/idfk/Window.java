@@ -317,6 +317,10 @@ public class Window implements Disposable {
         glfwSetWindowShouldClose(handle, true);
     }
 
+    public boolean isKeyDown(int key) {
+        return glfwGetKey(handle, key) == GLFW_PRESS;
+    }
+
     public Vector2i getWindowSize() {
         return this.windowSize;
     }

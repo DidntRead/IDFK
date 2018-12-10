@@ -53,7 +53,7 @@ public class Application implements Disposable {
 
             camera.update();
 
-            renderer.finish();
+            renderer.finish(camera);
 
             window.display();
 

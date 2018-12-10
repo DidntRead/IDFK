@@ -58,6 +58,10 @@ public class PauseMenu implements GameState, KeyCallback {
                         app.getStateManager().pop();
                     }
                     nk_spacing(ctx, 2);
+                    if (nk_button_label(ctx, "Settings")) {
+                        app.getStateManager().push(GameStateManager.GameState.Settings);
+                    }
+                    nk_spacing(ctx, 2);
                     if (nk_button_label(ctx, "Save and exit")) {
                         saveManager.saveCurrent();
                         app.getStateManager().pop(GameStateManager.GameState.MainMenu);

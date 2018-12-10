@@ -7,8 +7,7 @@ import proj.idfk.render.MasterRenderer;
 import proj.idfk.world.save.SaveManager;
 import proj.idfk.world.World;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
-import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
+import static org.lwjgl.glfw.GLFW.*;
 
 public class InGame implements GameState, KeyCallback {
     private final Application app;
@@ -39,7 +38,7 @@ public class InGame implements GameState, KeyCallback {
 
     @Override
     public void update(float delta) {
-        player.mouseInput(app.getWindow());
+        player.handleInput(app.getWindow());
         player.update(delta);
     }
 
@@ -53,6 +52,5 @@ public class InGame implements GameState, KeyCallback {
         if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
             app.getStateManager().push(GameStateManager.GameState.PauseMenu);
         }
-        player.keyboardInput(key, action == GLFW_PRESS);
     }
 }

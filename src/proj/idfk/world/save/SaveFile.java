@@ -1,5 +1,6 @@
 package proj.idfk.world.save;
 
+import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 import proj.idfk.world.World;
 
@@ -16,45 +17,46 @@ public class SaveFile {
     private Long seed;
 
     private static final int saveSize = 5 //HEADER
-    + 64 // Name
+    + 65 // Name
     + Long.BYTES // Seed
     ;
 
-    public static void saveWorld(World world, Path saveDirectory) {
-        try {
-            ByteBuffer worldBuffer = MemoryUtil.memAlloc(saveSize);
-            worldBuffer.put("*WLD*".getBytes());
-            ByteBuffer name = MemoryUtil.memUTF8(world.getName(), false);
-            worldBuffer.put(name);
-            worldBuffer.position(worldBuffer.position() + (64 - name.limit()));
-            worldBuffer.putLong(world.getSeed());
-            worldBuffer.flip();
-            FileChannel channel = FileChannel.open(saveDirectory.resolve(world.getName() + ".wld"), WRITE, CREATE);
-            channel.write(worldBuffer);
-            channel.close();
-            MemoryUtil.memFree(worldBuffer);
-            MemoryUtil.memFree(name);
-        } catch (IOException | NullPointerException e) {
-            e.printStackTrace();
-        }
-    }
-
     public SaveFile(String name, Path saveDirectory) {
         try {
-            FileChannel channel = FileChannel.open(saveDirectory.resolve(name + ".wld"), READ);
-            ByteBuffer world = MemoryUtil.memAlloc((int) channel.size());
-            if (world.getChar() == '*' || world.getChar() == 'W' || world.getChar() == 'L' || world.getChar() == 'D' || world.getChar() == '*') {
-                this.name = MemoryUtil.memUTF8(world, 64, world.position());
-                world.position(world.position() + 64);
-                this.seed = world.getLong();
-            } else {
-                isValid = false;
+            try (MemoryStack stack = MemoryStack.stackPush()) {
+                FileChannel channel = FileChannel.open(saveDirectory.resolve(name + ".wld"), READ);
+                ByteBuffer world = stack.calloc((int) channel.size());
+                channel.read(world);
+                world.position(0);
+                if (world.get() == '*' || world.get() == 'W' || world.get() == 'L' || world.get() == 'D' || world.get() == '*') {
+                    this.name = MemoryUtil.memUTF8(world, 64, 5).split("\0")[0];
+                    world.position(70);
+                    this.seed = world.getLong();
+                    isValid = true;
+                } else {
+                    isValid = false;
+                }
+                channel.close();
             }
-            MemoryUtil.memFree(world);
-            channel.close();
         } catch (IOException e) {
             e.printStackTrace();
             isValid = false;
+        }
+    }
+
+    public static void saveWorld(World world, Path saveDirectory) {
+        try {
+            FileChannel channel = FileChannel.open(saveDirectory.resolve(world.getName() + ".wld"), WRITE, CREATE, TRUNCATE_EXISTING);
+            ByteBuffer worldBuffer = MemoryUtil.memAlloc(saveSize);
+            worldBuffer.put("*WLD*".getBytes());
+            MemoryUtil.memUTF8(world.getName(), true, worldBuffer, 5);
+            worldBuffer.position(70);
+            worldBuffer.putLong(world.getSeed());
+            worldBuffer.flip();channel.write(worldBuffer);
+            channel.close();
+            MemoryUtil.memFree(worldBuffer);
+        } catch (IOException | NullPointerException e) {
+            e.printStackTrace();
         }
     }
 

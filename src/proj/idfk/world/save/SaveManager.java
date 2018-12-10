@@ -57,6 +57,7 @@ public class SaveManager {
     public void removeWorld(int index) {
         try {
             Files.deleteIfExists(saveDirectory.resolve(worlds.get(index) + ".wld"));
+            worlds.remove(index);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -83,7 +84,7 @@ public class SaveManager {
             seedLong = ThreadLocalRandom.current().nextLong();
         }
         current = new World(name, seedLong);
-        saveCurrent();
+        SaveFile.saveWorld(current, saveDirectory);
     }
 
     public void saveCurrent() {
