@@ -121,8 +121,8 @@ public class NuklearRenderer implements Disposable {
         try {
             ByteBuffer imgBuf = ioResourceToByteBuffer("background.png", 256 * 1024);
             int background = glCreateTextures(GL_TEXTURE_2D);
-            glTextureParameteri(background, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-            glTextureParameteri(background, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+            glTextureParameteri(background, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTextureParameteri(background, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTextureParameteri(background, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTextureParameteri(background, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             try (MemoryStack stack = MemoryStack.stackPush()) {

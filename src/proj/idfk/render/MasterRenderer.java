@@ -5,34 +5,44 @@ import org.lwjgl.nuklear.NkImage;
 import proj.idfk.Application;
 import proj.idfk.Camera;
 import proj.idfk.util.Disposable;
+import proj.idfk.util.VectorXZ;
+import proj.idfk.world.Chunk;
+
+import java.util.Map;
 
 import static org.lwjgl.opengl.GL45.*;
 
 public class MasterRenderer implements Disposable {
     private final NuklearRenderer nuklearRenderer;
-    private final TestRenderer testRenderer;
-    private boolean renderNuklear = true;
+    private final ChunkRenderer chunkRenderer;
+    private boolean inGame = false;
 
     public MasterRenderer(Application app) {
         this.nuklearRenderer = new NuklearRenderer(app);
-        this.testRenderer = new TestRenderer();
+        this.chunkRenderer = new ChunkRenderer();
         glBlendEquation(GL_FUNC_ADD);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_BLEND);
+        glDisable(GL_CULL_FACE);
+        glDisable(GL_DEPTH_TEST);
+        glEnable(GL_SCISSOR_TEST);
     }
 
     public void finish(Camera camera) {
-        glClear(GL_COLOR_BUFFER_BIT);
-        if (renderNuklear) {
-            glEnable(GL_BLEND);
-            glDisable(GL_CULL_FACE);
-            glDisable(GL_DEPTH_TEST);
-            glEnable(GL_SCISSOR_TEST);
-            nuklearRenderer.render();
-            glDisable(GL_BLEND);
-            glDisable(GL_SCISSOR_TEST);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        if (inGame) {
+            chunkRenderer.render(camera);
         } else {
-            testRenderer.render(camera);
+            nuklearRenderer.render();
         }
+    }
+
+    public void add(Chunk ch) {
+        chunkRenderer.add(ch);
+    }
+
+    public void add(Map<VectorXZ, Chunk> chunkMap) {
+        chunkRenderer.add(chunkMap);
     }
 
     public void beginInput() {
@@ -43,8 +53,19 @@ public class MasterRenderer implements Disposable {
         nuklearRenderer.endInput();
     }
 
-    public void setRenderNuklear(boolean v) {
-        this.renderNuklear = v;
+    public void setInGame(boolean v) {
+        this.inGame = v;
+        if (v) {
+            glDisable(GL_BLEND);
+            glDisable(GL_SCISSOR_TEST);
+            glEnable(GL_DEPTH_TEST);
+            glEnable(GL_CULL_FACE);
+        } else {
+            glEnable(GL_BLEND);
+            glDisable(GL_CULL_FACE);
+            glDisable(GL_DEPTH_TEST);
+            glEnable(GL_SCISSOR_TEST);
+        }
     }
 
     public NkContext getContext() {
@@ -58,6 +79,6 @@ public class MasterRenderer implements Disposable {
     @Override
     public void dispose() {
         nuklearRenderer.dispose();
-        testRenderer.dispose();
+        chunkRenderer.dispose();
     }
 }

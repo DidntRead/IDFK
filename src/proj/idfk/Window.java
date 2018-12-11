@@ -7,6 +7,8 @@ import org.lwjgl.nuklear.NkContext;
 import org.lwjgl.nuklear.NkVec2;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GLUtil;
+import org.lwjgl.system.Callback;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 import proj.idfk.callback.*;
@@ -27,6 +29,7 @@ public class Window implements Disposable {
     private final Vector2i framebufferSize;
     private final Vector2i windowSize;
     private final Vector2f cursorPosition;
+    private Callback debugCallback = null;
 
     private CharCallback charCallback = null;
     private KeyCallback keyCallback = null;
@@ -65,6 +68,8 @@ public class Window implements Disposable {
         }
 
         GL.createCapabilities();
+
+        this.debugCallback = GLUtil.setupDebugMessageCallback(System.err);
 
         GL11.glClearColor(0, 0, 0.1f, 1);
 
@@ -335,6 +340,9 @@ public class Window implements Disposable {
 
     @Override
     public void dispose() {
+        if (debugCallback != null) {
+            debugCallback.free();
+        }
         MemoryUtil.memFree(x);
         MemoryUtil.memFree(y);
         glfwDestroyWindow(handle);

@@ -67,9 +67,9 @@ public class Player extends Entity {
         }
 
         if (window.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
-            acceleration.y -= 0.2f;
+            position.y -= 0.02f;
         } else if (window.isKeyDown(GLFW_KEY_SPACE)) {
-            acceleration.y += 0.2f;
+            position.y += 0.02f;
         }
     }
 

@@ -4,6 +4,7 @@ import org.joml.Vector2i;
 import org.lwjgl.nuklear.*;
 import org.lwjgl.system.MemoryStack;
 import proj.idfk.Application;
+import proj.idfk.Camera;
 import proj.idfk.render.MasterRenderer;
 import proj.idfk.render.NuklearRenderer;
 
@@ -33,7 +34,7 @@ public class MainMenu implements GameState {
     }
 
     @Override
-    public void render(MasterRenderer renderer) {
+    public void render(MasterRenderer renderer, Camera camera) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             NkRect rect = NkRect.mallocStack(stack);
             final NkContext ctx = renderer.getContext();

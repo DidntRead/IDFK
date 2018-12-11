@@ -5,6 +5,7 @@ import org.lwjgl.nuklear.NkContext;
 import org.lwjgl.nuklear.NkRect;
 import org.lwjgl.system.MemoryStack;
 import proj.idfk.Application;
+import proj.idfk.Camera;
 import proj.idfk.callback.KeyCallback;
 import proj.idfk.render.MasterRenderer;
 import proj.idfk.world.save.SaveManager;
@@ -40,7 +41,7 @@ public class PauseMenu implements GameState, KeyCallback {
     }
 
     @Override
-    public void render(MasterRenderer renderer) {
+    public void render(MasterRenderer renderer, Camera camera) {
         final NkContext ctx = renderer.getContext();
         final Vector2i size = app.getWindow().getWindowSize();
 

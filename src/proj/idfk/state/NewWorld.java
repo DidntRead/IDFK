@@ -7,9 +7,9 @@ import org.lwjgl.nuklear.NkRect;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 import proj.idfk.Application;
+import proj.idfk.Camera;
 import proj.idfk.callback.KeyCallback;
 import proj.idfk.render.MasterRenderer;
-import proj.idfk.util.Disposable;
 import proj.idfk.world.save.SaveManager;
 
 import java.nio.ByteBuffer;
@@ -52,7 +52,7 @@ public class NewWorld implements GameState, KeyCallback {
     }
 
     @Override
-    public void render(MasterRenderer renderer) {
+    public void render(MasterRenderer renderer, Camera camera) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             final NkContext ctx = renderer.getContext();
             final Vector2i size = app.getWindow().getWindowSize();

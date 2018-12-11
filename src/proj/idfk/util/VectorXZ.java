@@ -1,8 +1,10 @@
 package proj.idfk.util;
 
+import java.util.Vector;
+
 public class VectorXZ {
-    private int x;
-    private int z;
+    public int x;
+    public int z;
 
     public VectorXZ(int x, int z) {
         this.x = x;
@@ -19,14 +21,6 @@ public class VectorXZ {
         this.z = 0;
     }
 
-    public int x() {
-        return this.x;
-    }
-
-    public int z() {
-        return this.z;
-    }
-
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -39,5 +33,16 @@ public class VectorXZ {
     @Override
     public String toString() {
         return this.x + " " + this.z;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (!VectorXZ.class.isAssignableFrom(obj.getClass())) return false;
+        if (obj == this) return true;
+
+        final VectorXZ vec = (VectorXZ) obj;
+
+        return vec.x == this.x && vec.z == this.z;
     }
 }

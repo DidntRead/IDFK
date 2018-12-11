@@ -1,6 +1,7 @@
 package proj.idfk.state;
 
 import proj.idfk.Application;
+import proj.idfk.Camera;
 import proj.idfk.callback.KeyCallback;
 import proj.idfk.entity.Player;
 import proj.idfk.render.MasterRenderer;
@@ -23,15 +24,16 @@ public class InGame implements GameState, KeyCallback {
 
     @Override
     public void on_enter() {
+        this.world = saveManager.getCurrentWorld();
         app.getWindow().disableNuklearInput();
         app.getCamera().hookEntity(player);
-        app.getRenderer().setRenderNuklear(false);
+        app.getRenderer().setInGame(true);
         this.world = saveManager.getCurrentWorld();
     }
 
     @Override
     public void on_exit() {
-        app.getRenderer().setRenderNuklear(true);
+        app.getRenderer().setInGame(false);
         app.getCamera().hookEntity(null);
         app.getWindow().enableNuklearInput();
     }
@@ -43,8 +45,9 @@ public class InGame implements GameState, KeyCallback {
     }
 
     @Override
-    public void render(MasterRenderer renderer) {
+    public void render(MasterRenderer renderer, Camera camera) {
         player.render();
+        world.render(app, camera);
     }
 
     @Override

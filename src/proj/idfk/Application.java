@@ -4,6 +4,10 @@ import proj.idfk.render.MasterRenderer;
 import proj.idfk.state.GameStateManager;
 import proj.idfk.util.Disposable;
 import proj.idfk.util.Timer;
+import proj.idfk.util.VectorXZ;
+import proj.idfk.world.Chunk;
+import proj.idfk.world.World;
+import proj.idfk.world.generation.NormalGenerator;
 import proj.idfk.world.save.SaveManager;
 
 import java.lang.reflect.Field;
@@ -38,6 +42,12 @@ public class Application implements Disposable {
         this.deltaTimer = new Timer();
     }
 
+    private float updateTimer = -1f;
+
+    private float averageDelta;
+    private float maxDelta = Float.MIN_VALUE;
+    private float minDelta = Float.MAX_VALUE;
+
     public void mainLoop() {
         while (!window.shouldClose() && !stateManager.isEmpty()) {
             float delta = deltaTimer.elapsed();
@@ -49,7 +59,7 @@ public class Application implements Disposable {
 
             stateManager.update(delta);
 
-            stateManager.render(renderer);
+            stateManager.render(renderer, camera);
 
             camera.update();
 
@@ -60,11 +70,6 @@ public class Application implements Disposable {
             stateManager.signal();
         }
     }
-
-    private float averageDelta;
-    private float maxDelta = Float.MIN_VALUE;
-    private float minDelta = Float.MAX_VALUE;
-    private float updateTimer = 750f;
 
     private void measureDelta(float delta) {
         if (debug) {
@@ -82,7 +87,7 @@ public class Application implements Disposable {
             averageDelta /= 2f;
 
             if (updateTimer < 0) {
-                updateTimer = 750f;
+                updateTimer = 1000f;
                 window.setTitle(name + String.format(" - FPS: %.2f, Average: %.2f, Min: %.2f, Max: %.2f", 1000 / averageDelta, averageDelta, minDelta, maxDelta));
             }
         }

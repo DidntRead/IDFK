@@ -1,6 +1,7 @@
 package proj.idfk.state;
 
 import proj.idfk.Application;
+import proj.idfk.Camera;
 import proj.idfk.Window;
 import proj.idfk.render.MasterRenderer;
 import proj.idfk.world.save.SaveManager;
@@ -60,8 +61,8 @@ public class GameStateManager {
         current.update(delta);
     }
 
-    public void render(MasterRenderer renderer) {
-        current.render(renderer);
+    public void render(MasterRenderer renderer, Camera camera) {
+        current.render(renderer, camera);
     }
 
     public boolean isEmpty() {

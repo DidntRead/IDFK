@@ -6,6 +6,7 @@ import org.lwjgl.nuklear.NkRect;
 import org.lwjgl.nuklear.NkVec2;
 import org.lwjgl.system.MemoryStack;
 import proj.idfk.Application;
+import proj.idfk.Camera;
 import proj.idfk.Config;
 import proj.idfk.callback.KeyCallback;
 import proj.idfk.render.MasterRenderer;
@@ -42,7 +43,7 @@ public class Settings implements GameState, KeyCallback {
     }
 
     @Override
-    public void render(MasterRenderer renderer) {
+    public void render(MasterRenderer renderer, Camera camera) {
         final NkContext ctx = renderer.getContext();
         final Config config = app.getConfig();
         try (MemoryStack stack = MemoryStack.stackPush()) {
