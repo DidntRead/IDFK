@@ -36,7 +36,7 @@ public class Camera {
 
         viewMatrix = Matrix.makeViewMatrix(this);
         projViewMatrix.set(projectionMatrix).mul(viewMatrix);
-        frustrum.set(projViewMatrix);
+        frustrum.set(projViewMatrix, false);
     }
 
     public void hookEntity(final Entity ent) {
