@@ -12,12 +12,12 @@ import static proj.idfk.world.Constants.CHUNK_SIZE;
 
 public class ChunkMeshBuilder {
     // Greedy meshing
-    private static final int SOUTH      = 0;
-    private static final int NORTH      = 1;
-    private static final int EAST       = 2;
-    private static final int WEST       = 3;
-    private static final int TOP        = 4;
-    private static final int BOTTOM     = 5;
+    public static final int SOUTH      = 0;
+    public static final int NORTH      = 1;
+    public static final int EAST       = 2;
+    public static final int WEST       = 3;
+    public static final int TOP        = 4;
+    public static final int BOTTOM     = 5;
     private Chunk chunk;
 
     public ChunkMeshBuilder(Chunk chunk) {
@@ -32,7 +32,7 @@ public class ChunkMeshBuilder {
     private void greedy() {
             FloatBuffer vertexBuf = MemoryUtil.memAllocFloat((48 * 6) * Constants.CHUNK_VOLUME);
             IntBuffer indexBuf = MemoryUtil.memAllocInt((24 * 6) * Constants.CHUNK_VOLUME);
-            FloatBuffer textureBuf = MemoryUtil.memAllocFloat(6 * Constants.CHUNK_VOLUME);
+            FloatBuffer textureBuf = MemoryUtil.memAllocFloat(24 * Constants.CHUNK_VOLUME);
             final VectorXZ position = this.chunk.getPosition();
             int index = 0;
             /*
@@ -192,6 +192,9 @@ public class ChunkMeshBuilder {
                                         dv[2] = 0;
                                         dv[v] = h;
 
+                                        final int textureIndex = BlockID.getTextureIndex(mask[n].type, mask[n].side);
+                                        textureBuf.put(new float[] {textureIndex, textureIndex, textureIndex, textureIndex});
+
                                         // QUAD
                                         // BOTTOM LEFT
                                         vertexBuf.put(x[0] + position.x * CHUNK_SIZE);
@@ -212,8 +215,6 @@ public class ChunkMeshBuilder {
                                         vertexBuf.put(x[0] + du[0] + dv[0] + position.x * CHUNK_SIZE);
                                         vertexBuf.put(x[1] + du[1] + dv[1]);
                                         vertexBuf.put(x[2] + du[2] + dv[2] + position.z * CHUNK_SIZE);
-
-                                        textureBuf.put(BlockID.getTextureIndex(mask[n].type, mask[n].side));
 
                                         if (backFace) {
                                             indexBuf.put(2 + index);
@@ -279,27 +280,27 @@ public class ChunkMeshBuilder {
         face.side = side;
         face.type = this.chunk.getBlock(x, y, z);
 
-        if (this.chunk.getBlock(x, y, z) == 0) {
+        if (this.chunk.getBlock(x, y, z) == BlockID.AIR) {
             face.transparent = true;
         } else {
             switch (side) {
                 case TOP:
-                    face.transparent = y != (CHUNK_HEIGHT - 1) && this.chunk.getBlock(x, y + 1, z) != 0;
+                    face.transparent = y != (CHUNK_HEIGHT - 1) && this.chunk.getBlock(x, y + 1, z) != BlockID.AIR;
                     break;
                 case BOTTOM:
-                    face.transparent = y != 0 && chunk.getBlock(x, y - 1, z) != 0;
+                    face.transparent = y != 0 && chunk.getBlock(x, y - 1, z) != BlockID.AIR;
                     break;
                 case NORTH:
-                    face.transparent = z != (Constants.CHUNK_SIZE - 1) && chunk.getBlock(x, y, z + 1) != 0;
+                    face.transparent = z != (Constants.CHUNK_SIZE - 1) && chunk.getBlock(x, y, z + 1) != BlockID.AIR;
                     break;
                 case SOUTH:
-                    face.transparent = z != 0 && chunk.getBlock(x, y, z - 1) != 0;
+                    face.transparent = z != 0 && chunk.getBlock(x, y, z - 1) != BlockID.AIR;
                     break;
                 case EAST:
-                    face.transparent = x != (Constants.CHUNK_SIZE - 1) && chunk.getBlock(x + 1, y, z) != 0;
+                    face.transparent = x != (Constants.CHUNK_SIZE - 1) && chunk.getBlock(x + 1, y, z) != BlockID.AIR;
                     break;
                 case WEST:
-                    face.transparent = x != 0 && chunk.getBlock(x - 1, y, z) != 0;
+                    face.transparent = x != 0 && chunk.getBlock(x - 1, y, z) != BlockID.AIR;
                     break;
             }
         }

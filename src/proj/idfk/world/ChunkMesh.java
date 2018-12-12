@@ -28,8 +28,6 @@ public class ChunkMesh implements Disposable {
 
         glVertexArrayAttribBinding(vao, 0, 0);
         glVertexArrayAttribBinding(vao, 1, 1);
-
-        glVertexArrayBindingDivisor(vao, 1, 3);
     }
 
     public void bind() {
@@ -46,7 +44,7 @@ public class ChunkMesh implements Disposable {
         glNamedBufferStorage(vbo, (positionVertex.limit() + textureIndex.limit()) * Float.BYTES, GL_DYNAMIC_STORAGE_BIT);
         glNamedBufferSubData(vbo, 0, positionVertex);
         glNamedBufferSubData(vbo, positionVertex.limit() * Float.BYTES, textureIndex);
-        glVertexArrayVertexBuffer(vao, 1, vbo, positionVertex.limit(), 4);
+        glVertexArrayVertexBuffer(vao, 1, vbo, positionVertex.limit() * Float.BYTES, 4);
         glNamedBufferData(ebo, elementIndex, GL_STATIC_DRAW);
         this.count = elementIndex.limit();
     }

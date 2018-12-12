@@ -1,6 +1,7 @@
 package proj.idfk.world.save;
 
 import org.lwjgl.system.Platform;
+import proj.idfk.Application;
 import proj.idfk.world.World;
 
 import java.io.IOException;
@@ -14,11 +15,13 @@ import java.util.zip.CRC32C;
 
 public class SaveManager {
     public final Path saveDirectory;
+    private final Application app;
     private World current = null;
 
     List<String> worlds;
 
-    public SaveManager() {
+    public SaveManager(Application app) {
+        this.app = app;
         switch (Platform.get()) {
             case WINDOWS:
                 saveDirectory = Paths.get(System.getenv("APPDATA"), ".idfk", "saves");
@@ -66,7 +69,7 @@ public class SaveManager {
     public boolean loadWorld(int index) {
         SaveFile saveFile = new SaveFile(worlds.get(index), saveDirectory);
         if (saveFile.isValid()) {
-            this.current = new World(saveFile.getName(), saveFile.getSeed());
+            this.current = new World(saveFile.getName(), saveFile.getSeed(), app.getConfig(), saveFile.getPlayerPosition());
             return true;
         } else {
             return false;
@@ -83,7 +86,7 @@ public class SaveManager {
         } else {
             seedLong = ThreadLocalRandom.current().nextLong();
         }
-        current = new World(name, seedLong);
+        current = new World(name, seedLong, app.getConfig());
         SaveFile.saveWorld(current, saveDirectory);
     }
 

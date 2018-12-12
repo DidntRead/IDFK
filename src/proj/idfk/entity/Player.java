@@ -14,8 +14,8 @@ public class Player extends Entity {
     private Config config;
 
 
-    public Player(Config config) {
-        super(new Vector3f(0, 6, 0), new Vector3f(0, 0, 0), new Vector3f(0.3f, 1, 0.3f));
+    public Player(Config config, Vector3f position) {
+        super(position, new Vector3f(0, 0, 0), new Vector3f(0.8f, 2, 0.5f));
         this.config = config;
         this.acceleration = new Vector3f();
     }

@@ -2,6 +2,7 @@ package proj.idfk.render;
 
 import proj.idfk.Camera;
 import proj.idfk.shader.ChunkShader;
+import proj.idfk.texture.TextureArray;
 import proj.idfk.util.Disposable;
 import proj.idfk.util.VectorXZ;
 import proj.idfk.world.Chunk;
@@ -14,11 +15,14 @@ import static org.lwjgl.opengl.GL45.*;
 
 public class ChunkRenderer implements Disposable {
     private ChunkShader shader;
+    private TextureArray blocksTexture;
     private List<Chunk> meshList;
 
     public ChunkRenderer() {
         this.shader = new ChunkShader();
         this.meshList = new ArrayList<>();
+        this.blocksTexture = new TextureArray("textures/block/", 5);
+        shader.loadBlockTextureArrayHandle(blocksTexture.getTextureHandle());
     }
 
     public void add(Chunk ch) {
@@ -30,7 +34,6 @@ public class ChunkRenderer implements Disposable {
     }
 
     public void render(Camera camera) {
-        System.out.println("CHUNK SIZE: " + meshList.size());
         shader.loadProjectionView(camera.getProjectionViewMatrix());
         shader.bind();
         for (Chunk chunk : meshList) {
@@ -42,6 +45,7 @@ public class ChunkRenderer implements Disposable {
 
     @Override
     public void dispose() {
+        blocksTexture.dispose();
         shader.dispose();
     }
 }

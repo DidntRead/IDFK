@@ -1,10 +1,11 @@
 package proj.idfk.world;
 
 import org.joml.AABBf;
-import org.joml.Vector2i;
+import org.joml.Vector3f;
 import proj.idfk.Application;
 import proj.idfk.Camera;
 import proj.idfk.Config;
+import proj.idfk.entity.Player;
 import proj.idfk.util.VectorXZ;
 import proj.idfk.world.generation.ChunkGenerator;
 import proj.idfk.world.generation.NormalGenerator;
@@ -12,22 +13,37 @@ import proj.idfk.world.generation.NormalGenerator;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static proj.idfk.world.Constants.CHUNK_HEIGHT;
 import static proj.idfk.world.Constants.CHUNK_SIZE;
 
 public class World {
     private final String name;
     private final Long seed;
+    private final Player player;
     private final ChunkGenerator generator;
     private final Map<VectorXZ, Chunk> chunkMap;
 
-    public World(String name, Long seed) {
+    public World(String name, Long seed, Config config, Vector3f playerPosition) {
+        this.name = name;
+        this.seed = seed;
+        this.player = new Player(config, playerPosition);
+        this.generator = new NormalGenerator(seed);
+        this.chunkMap = new ConcurrentHashMap<>();
+    }
+
+    public World(String name, Long seed, Config config) {
         this.name = name;
         this.seed = seed;
         this.generator = new NormalGenerator(seed);
-        this.chunkMap = new ConcurrentHashMap<VectorXZ, Chunk>();
+        this.chunkMap = new ConcurrentHashMap<>();
+        this.player = new Player(config, new Vector3f(0, getHeight(0, 0), 0));
     }
 
-    public Chunk getChunk(VectorXZ position) {
+    public Player getPlayer() {
+        return this.player;
+    }
+
+    private Chunk getChunk(VectorXZ position) {
         Chunk ch = chunkMap.get(position);
         if (ch == null) {
             ch = new Chunk(position, generator);
@@ -67,6 +83,29 @@ public class World {
                 }
             }
         }
+    }
+
+    private VectorXZ getChunkXZ(int x, int z) {
+        return new VectorXZ(x / CHUNK_SIZE, z / CHUNK_SIZE);
+    }
+
+    private VectorXZ getBlockXZ(int x, int z) {
+        return new VectorXZ(x % CHUNK_SIZE, z % CHUNK_SIZE);
+    }
+
+    private int getHeight(int x, int z) {
+        final VectorXZ chunk = getChunkXZ(x, z);
+        final VectorXZ block = getBlockXZ(x, z);
+
+        Chunk ch = getChunk(chunk);
+
+        for (int i = CHUNK_HEIGHT -1; i >= 0; i--) {
+            if (ch.getBlock(block.x, i, block.z) != BlockID.AIR) {
+                return i + 3;
+            }
+        }
+
+        return CHUNK_HEIGHT + 3;
     }
 
     public String getName() {

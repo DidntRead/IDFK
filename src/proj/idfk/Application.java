@@ -11,6 +11,7 @@ import proj.idfk.world.generation.NormalGenerator;
 import proj.idfk.world.save.SaveManager;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 
 public class Application implements Disposable {
     private boolean debug;
@@ -24,6 +25,10 @@ public class Application implements Disposable {
     @SuppressWarnings("FieldCanBeLocal")
     private final SaveManager saveManager;
 
+    private float[] delta = new float[10];
+
+    private float updateTimer = -1f;
+    private int index = 0;
     public Application(String name, Config config) {
         // Debug
         try {
@@ -36,15 +41,11 @@ public class Application implements Disposable {
         this.config = config;
         this.window = new Window(name, config, debug);
         this.renderer = new MasterRenderer(this);
-        this.saveManager = new SaveManager();
+        this.saveManager = new SaveManager(this);
         this.stateManager = new GameStateManager(this, saveManager);
         this.camera = new Camera(config);
         this.deltaTimer = new Timer();
     }
-
-    private float updateTimer = -1f;
-
-    private float averageDelta;
     private float maxDelta = Float.MIN_VALUE;
     private float minDelta = Float.MAX_VALUE;
 
@@ -79,18 +80,31 @@ public class Application implements Disposable {
 
             if (delta > maxDelta) {
                 maxDelta = delta;
-            } else if (delta < minDelta) {
+            }
+            if (delta < minDelta) {
                 minDelta = delta;
             }
 
-            averageDelta += delta;
-            averageDelta /= 2f;
+            if (index >= this.delta.length) {
+                index = 0;
+            }
+            this.delta[index++] = delta;
+
+            float averageDelta = average(this.delta);
 
             if (updateTimer < 0) {
                 updateTimer = 1000f;
                 window.setTitle(name + String.format(" - FPS: %.2f, Average: %.2f, Min: %.2f, Max: %.2f", 1000 / averageDelta, averageDelta, minDelta, maxDelta));
             }
         }
+    }
+
+    private float average(float[] arr) {
+        float res = 0f;
+        for (float f : arr) {
+            res += f;
+        }
+        return res / arr.length;
     }
 
     private void setupDebug(Class cl) {

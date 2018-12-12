@@ -27,6 +27,8 @@ public class Entity {
         this.position = position;
         this.rotation = rotation;
         this.velocity = new Vector3f();
-        this.box = new AABBf(position.x, position.y, position.z, dimensions.x, dimensions.y, dimensions.z);
+        this.box = new AABBf();
+        this.box.setMin(position);
+        this.box.setMax(dimensions.add(position));
     }
 }

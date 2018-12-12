@@ -1,19 +1,24 @@
 package proj.idfk.world;
 
+import org.joml.AABBf;
 import proj.idfk.util.Disposable;
 import proj.idfk.util.VectorXZ;
 import proj.idfk.world.generation.ChunkGenerator;
+
+import static proj.idfk.world.Constants.CHUNK_SIZE;
 
 public class Chunk implements Disposable {
     private final ChunkMesh mesh;
     private final ChunkMeshBuilder meshBuilder;
     private final VectorXZ position;
+    public final AABBf aabb;
     private byte[] blocks;
     private boolean dirty = true;
 
     protected Chunk(VectorXZ position, ChunkGenerator generator) {
         this.position = position;
         this.mesh = new ChunkMesh();
+        this.aabb = new AABBf(position.x * CHUNK_SIZE, 0, position.z * CHUNK_SIZE, (position.x + 1) * CHUNK_SIZE, 16, (position.z + 1) * CHUNK_SIZE);
         this.meshBuilder = new ChunkMeshBuilder(this);
         this.blocks = new byte[Constants.CHUNK_VOLUME];
         generator.generate(this);
@@ -21,7 +26,7 @@ public class Chunk implements Disposable {
     }
 
     private int getFlatIndex(int x, int y, int z) {
-        return (x + Constants.CHUNK_SIZE * (y + Constants.CHUNK_HEIGHT * z));
+        return (x + CHUNK_SIZE * (y + Constants.CHUNK_HEIGHT * z));
     }
 
     public byte getBlock(int x, int y, int z) {
