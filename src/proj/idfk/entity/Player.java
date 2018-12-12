@@ -9,7 +9,7 @@ import proj.idfk.Window;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class Player extends Entity {
-    private static final float speed = 0.2f;
+    private static final float speed = 1f;
     private Vector3f acceleration;
     private Config config;
 
@@ -48,7 +48,7 @@ public class Player extends Entity {
         if (window.isKeyDown(GLFW_KEY_W)) {
             float s = speed;
             if (window.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-                s *= 5;
+                s /= 5;
             }
             acceleration.x += -Math.cos(Math.toRadians(rotation.y + 90)) * s;
             acceleration.z += -Math.sin(Math.toRadians(rotation.y + 90)) * s;
