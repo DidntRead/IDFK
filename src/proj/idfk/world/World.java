@@ -1,5 +1,6 @@
 package proj.idfk.world;
 
+import org.joml.AABBf;
 import org.joml.Vector2i;
 import proj.idfk.Application;
 import proj.idfk.Camera;
@@ -60,7 +61,10 @@ public class World {
             {
                chunkMap.remove(location).dispose();
             } else {
-                app.getRenderer().add(chunk);
+                final AABBf aabb = chunk.aabb;
+                if (camera.getFrustrum().testAab(aabb.minX, aabb.minY, aabb.minZ, aabb.maxX, aabb.maxY, aabb.maxZ)) {
+                    app.getRenderer().add(chunk);
+                }
             }
         }
     }
