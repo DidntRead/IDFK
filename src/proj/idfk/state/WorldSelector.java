@@ -62,7 +62,7 @@ public class WorldSelector implements GameState, KeyCallback {
                     if (nk_list_view_begin(ctx, worldsList, "Worlds", NK_WINDOW_BORDER, 100, worlds.size())) {
                         nk_layout_row_dynamic(ctx, 100, 1);
                         {
-                            for (int i = 0; i < worlds.size(); i++) {
+                            for (int i = 0; i < worlds.size() - worldsList.begin(); i++) {
                                 if (nk_button_label(ctx, worlds.get(worldsList.begin() + i))) {
                                     selected = i;
                                 }

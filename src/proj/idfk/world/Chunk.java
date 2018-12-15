@@ -29,6 +29,17 @@ public class Chunk implements Disposable {
         return (x + CHUNK_SIZE * (y + Constants.CHUNK_HEIGHT * z));
     }
 
+    public int getHeight(int x, int z) {
+        x = Math.abs(x);
+        z = Math.abs(z);
+        for (int i = Constants.CHUNK_HEIGHT - 1; i >= 0; i--) {
+            if (getBlock(x, i, z) != 0) {
+                return i;
+            }
+        }
+        return Constants.CHUNK_HEIGHT;
+    }
+
     public byte getBlock(int x, int y, int z) {
         return this.blocks[getFlatIndex(x, y, z)];
     }

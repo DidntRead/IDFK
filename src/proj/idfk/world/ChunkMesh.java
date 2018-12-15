@@ -9,6 +9,7 @@ import static org.lwjgl.opengl.GL45.*;
 
 public class ChunkMesh implements Disposable {
     private final int vao;
+    private int vboSize = 0;
     private int vbo,ebo;
     private int count;
 
@@ -41,7 +42,16 @@ public class ChunkMesh implements Disposable {
     public void uploadData(FloatBuffer positionVertex, FloatBuffer textureIndex, IntBuffer elementIndex) {
         glInvalidateBufferData(vbo);
         glInvalidateBufferData(ebo);
-        glNamedBufferStorage(vbo, (positionVertex.limit() + textureIndex.limit()) * Float.BYTES, GL_DYNAMIC_STORAGE_BIT);
+        int vertexSize = (positionVertex.limit() + textureIndex.limit()) * Float.BYTES;
+        if (vertexSize > vboSize) {
+            if (vbo != 0) {
+                glDeleteBuffers(vbo);
+                this.vbo = glCreateBuffers();
+                glVertexArrayVertexBuffer(vao, 0, vbo, 0, 12);
+            }
+            glNamedBufferStorage(vbo, vertexSize, GL_DYNAMIC_STORAGE_BIT);
+            this.vboSize = vertexSize;
+        }
         glNamedBufferSubData(vbo, 0, positionVertex);
         glNamedBufferSubData(vbo, positionVertex.limit() * Float.BYTES, textureIndex);
         glVertexArrayVertexBuffer(vao, 1, vbo, positionVertex.limit() * Float.BYTES, 4);

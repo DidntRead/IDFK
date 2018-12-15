@@ -2,10 +2,11 @@ package proj.idfk.world;
 
 import org.joml.AABBf;
 import org.joml.Vector3f;
+import org.joml.Vector3i;
 import proj.idfk.Application;
 import proj.idfk.Camera;
 import proj.idfk.Config;
-import proj.idfk.entity.Player;
+import proj.idfk.player.Player;
 import proj.idfk.util.VectorXZ;
 import proj.idfk.world.generation.ChunkGenerator;
 import proj.idfk.world.generation.NormalGenerator;
@@ -26,7 +27,7 @@ public class World {
     public World(String name, Long seed, Config config, Vector3f playerPosition) {
         this.name = name;
         this.seed = seed;
-        this.player = new Player(config, playerPosition);
+        this.player = new Player(config, playerPosition, this);
         this.generator = new NormalGenerator(seed);
         this.chunkMap = new ConcurrentHashMap<>();
     }
@@ -36,7 +37,7 @@ public class World {
         this.seed = seed;
         this.generator = new NormalGenerator(seed);
         this.chunkMap = new ConcurrentHashMap<>();
-        this.player = new Player(config, new Vector3f(0, getHeight(0, 0), 0));
+        this.player = new Player(config, new Vector3f(0, getHeight(0, 0), 0), this);
     }
 
     public Player getPlayer() {
@@ -90,7 +91,29 @@ public class World {
     }
 
     private VectorXZ getBlockXZ(int x, int z) {
-        return new VectorXZ(x % CHUNK_SIZE, z % CHUNK_SIZE);
+        return new VectorXZ(Math.abs(x % CHUNK_SIZE), Math.abs(z % CHUNK_SIZE));
+    }
+
+    public byte getBlock(int x, int y, int z) {
+        if (y > CHUNK_HEIGHT - 1 || y < 0) {
+            return 0;
+        }
+        final VectorXZ block = getBlockXZ(x, z);
+        return getChunk(getChunkXZ(x, z)).getBlock(block.x, y, block.z);
+    }
+
+    public void setBlock(int x, int y, int z, byte id) {
+        final VectorXZ block = getBlockXZ(x, z);
+        getChunk(getChunkXZ(x, z)).setBlock(block.x, y, block.z, id);
+    }
+
+    public void setBlock(Vector3i pos, byte id) {
+        final VectorXZ block = getBlockXZ(pos.x, pos.z);
+        getChunk(getChunkXZ(pos.x, pos.z)).setBlock(block.x, pos.y, block.z, id);
+    }
+
+    public Chunk get(int worldX, int worldZ) {
+        return getChunk(getChunkXZ(worldX, worldZ));
     }
 
     private int getHeight(int x, int z) {
@@ -101,11 +124,11 @@ public class World {
 
         for (int i = CHUNK_HEIGHT -1; i >= 0; i--) {
             if (ch.getBlock(block.x, i, block.z) != BlockID.AIR) {
-                return i + 3;
+                return i + 1;
             }
         }
 
-        return CHUNK_HEIGHT + 3;
+        return CHUNK_HEIGHT + 1;
     }
 
     public String getName() {

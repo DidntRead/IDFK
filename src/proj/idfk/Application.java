@@ -42,8 +42,8 @@ public class Application implements Disposable {
         this.window = new Window(name, config, debug);
         this.renderer = new MasterRenderer(this);
         this.saveManager = new SaveManager(this);
-        this.stateManager = new GameStateManager(this, saveManager);
         this.camera = new Camera(config);
+        this.stateManager = new GameStateManager(this, saveManager);
         this.deltaTimer = new Timer();
     }
     private float maxDelta = Float.MIN_VALUE;

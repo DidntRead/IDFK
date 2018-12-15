@@ -29,6 +29,7 @@ public class Window implements Disposable {
     private final Vector2i framebufferSize;
     private final Vector2i windowSize;
     private final Vector2f cursorPosition;
+    private final Vector2f NDCPosition;
     private Callback debugCallback = null;
 
     private CharCallback charCallback = null;
@@ -84,6 +85,7 @@ public class Window implements Disposable {
             DoubleBuffer mouseY = stack.callocDouble(1);
             glfwGetCursorPos(handle, mouseX, mouseY);
             this.cursorPosition = new Vector2f((float)mouseX.get(0), (float)mouseY.get(0));
+            this.NDCPosition = new Vector2f((2.0f * cursorPosition.x) / windowSize.x - 1.0f, 1.0f - (2.0f * cursorPosition.y) / windowSize.y);
         }
 
         glfwSetCharCallback(handle, new GLFWCharCallback() {
@@ -191,6 +193,7 @@ public class Window implements Disposable {
                     nk_input_motion(ctx, (int) xpos, (int) ypos);
                 }
                 cursorPosition.set((float) xpos, (float) ypos);
+                NDCPosition.set((float)((2.0f * xpos) / windowSize.x - 1.0f), (float)(1.0f - (2.0f * ypos) / windowSize.y));
             }
         });
 
@@ -336,6 +339,10 @@ public class Window implements Disposable {
 
     public Vector2f getCursorPosition() {
         return this.cursorPosition;
+    }
+
+    public Vector2f getNDCPosition() {
+        return this.NDCPosition;
     }
 
     @Override

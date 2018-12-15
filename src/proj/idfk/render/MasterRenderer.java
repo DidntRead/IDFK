@@ -2,24 +2,25 @@ package proj.idfk.render;
 
 import org.lwjgl.nuklear.NkContext;
 import org.lwjgl.nuklear.NkImage;
+import org.lwjgl.opengl.ARBBindlessTexture;
 import proj.idfk.Application;
 import proj.idfk.Camera;
 import proj.idfk.util.Disposable;
-import proj.idfk.util.VectorXZ;
 import proj.idfk.world.Chunk;
-
-import java.util.Map;
 
 import static org.lwjgl.opengl.GL45.*;
 
 public class MasterRenderer implements Disposable {
     private final NuklearRenderer nuklearRenderer;
+    private final GUIRenderer guiRenderer;
     private final ChunkRenderer chunkRenderer;
     private boolean inGame = false;
 
     public MasterRenderer(Application app) {
         this.nuklearRenderer = new NuklearRenderer(app);
         this.chunkRenderer = new ChunkRenderer();
+        this.guiRenderer = new GUIRenderer();
+
         glBlendEquation(GL_FUNC_ADD);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_BLEND);
@@ -29,9 +30,11 @@ public class MasterRenderer implements Disposable {
     }
 
     public void finish(Camera camera) {
+        // Render to our framebuffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         if (inGame) {
             chunkRenderer.render(camera);
+            //guiRenderer.render();
         } else {
             nuklearRenderer.render();
         }
@@ -39,10 +42,6 @@ public class MasterRenderer implements Disposable {
 
     public void add(Chunk ch) {
         chunkRenderer.add(ch);
-    }
-
-    public void add(Map<VectorXZ, Chunk> chunkMap) {
-        chunkRenderer.add(chunkMap);
     }
 
     public void beginInput() {
@@ -78,6 +77,7 @@ public class MasterRenderer implements Disposable {
 
     @Override
     public void dispose() {
+        guiRenderer.dispose();
         nuklearRenderer.dispose();
         chunkRenderer.dispose();
     }

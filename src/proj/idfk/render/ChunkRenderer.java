@@ -29,10 +29,6 @@ public class ChunkRenderer implements Disposable {
         meshList.add(ch);
     }
 
-    public void add(Map<VectorXZ, Chunk> chunkMap) {
-        meshList.addAll(chunkMap.values());
-    }
-
     public void render(Camera camera) {
         shader.loadProjectionView(camera.getProjectionViewMatrix());
         shader.bind();

@@ -1,22 +1,29 @@
-package proj.idfk.entity;
+package proj.idfk.player;
 
 import org.joml.Math;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import proj.idfk.Config;
 import proj.idfk.Window;
+import proj.idfk.entity.Entity;
+import proj.idfk.render.MasterRenderer;
+import proj.idfk.world.BlockID;
+import proj.idfk.world.World;
 
 import static org.lwjgl.glfw.GLFW.*;
 
 public class Player extends Entity {
-    private static final float speed = 1f;
+    private static final float speed = 0.5f;
     private Vector3f acceleration;
-    private Config config;
+    private final Config config;
+    private final World world;
+    private boolean isOnGround = true;
 
 
-    public Player(Config config, Vector3f position) {
+    public Player(Config config, Vector3f position, World world) {
         super(position, new Vector3f(0, 0, 0), new Vector3f(0.8f, 2, 0.5f));
         this.config = config;
+        this.world = world;
         this.acceleration = new Vector3f();
     }
 
@@ -24,19 +31,32 @@ public class Player extends Entity {
         velocity.add(acceleration);
         acceleration.zero();
 
-        position.x += velocity.x * delta;
-        position.y += velocity.y * delta;
-        position.z += velocity.z * delta;
+        move(delta);
 
         box.setMin(position);
+        box.setMax(dimensions.x + position.x, dimensions.y + position.y, dimensions.z + position.z);
 
         velocity.x *= 0.95f;
         velocity.z *= 0.95f;
+        if (!isOnGround) {
+            velocity.y *= 0.95f;
+        }
+    }
+
+    private void move(float delta) {
+
+        position.x += velocity.x * delta;
+        position.y += velocity.y * delta;
+        position.z += velocity.z * delta;
     }
 
     @SuppressWarnings("EmptyMethod")
-    public void render() {
+    public void render(MasterRenderer renderer) {
         //TODO render player
+    }
+
+    public void scroll(float yoffset) {
+
     }
 
     public void handleInput(Window window) {
@@ -65,11 +85,12 @@ public class Player extends Entity {
             acceleration.x += Math.cos(Math.toRadians(rotation.y)) * speed;
             acceleration.z += Math.sin(Math.toRadians(rotation.y)) * speed;
         }
+    }
 
-        if (window.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
-            position.y -= 0.02f;
-        } else if (window.isKeyDown(GLFW_KEY_SPACE)) {
-            position.y += 0.02f;
+    public void jump() {
+        if (isOnGround) {
+            isOnGround = false;
+            acceleration.y += speed * 250f;
         }
     }
 

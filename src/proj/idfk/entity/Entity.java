@@ -7,6 +7,7 @@ public class Entity {
     public Vector3f position;
     public Vector3f rotation;
     public Vector3f velocity;
+    public Vector3f dimensions;
     public AABBf box;
 
     public Entity() {
@@ -27,6 +28,7 @@ public class Entity {
         this.position = position;
         this.rotation = rotation;
         this.velocity = new Vector3f();
+        this.dimensions = new Vector3f(dimensions);
         this.box = new AABBf();
         this.box.setMin(position);
         this.box.setMax(dimensions.add(position));
