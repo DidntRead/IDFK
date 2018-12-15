@@ -11,12 +11,14 @@ import proj.idfk.world.Chunk;
 import static org.lwjgl.opengl.GL45.*;
 
 public class MasterRenderer implements Disposable {
+    private final Application app;
     private final NuklearRenderer nuklearRenderer;
     private final GUIRenderer guiRenderer;
     private final ChunkRenderer chunkRenderer;
     private boolean inGame = false;
 
     public MasterRenderer(Application app) {
+        this.app = app;
         this.nuklearRenderer = new NuklearRenderer(app);
         this.chunkRenderer = new ChunkRenderer();
         this.guiRenderer = new GUIRenderer();
@@ -55,11 +57,13 @@ public class MasterRenderer implements Disposable {
     public void setInGame(boolean v) {
         this.inGame = v;
         if (v) {
+            app.getWindow().setCursorMode(false);
             glDisable(GL_BLEND);
             glDisable(GL_SCISSOR_TEST);
             glEnable(GL_DEPTH_TEST);
             glEnable(GL_CULL_FACE);
         } else {
+            app.getWindow().setCursorMode(true);
             glEnable(GL_BLEND);
             glDisable(GL_CULL_FACE);
             glDisable(GL_DEPTH_TEST);

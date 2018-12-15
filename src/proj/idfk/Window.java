@@ -321,6 +321,10 @@ public class Window implements Disposable {
         backup = null;
     }
 
+    public void setCursorMode(boolean enabled) {
+        glfwSetInputMode(handle, GLFW_CURSOR, enabled ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+    }
+
     public void setShouldClose() {
         glfwSetWindowShouldClose(handle, true);
     }
