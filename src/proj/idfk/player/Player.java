@@ -17,7 +17,7 @@ public class Player extends Entity {
     private Vector3f acceleration;
     private final Config config;
     private final World world;
-    private boolean isOnGround = true;
+    private boolean isOnGround = false;
 
 
     public Player(Config config, Vector3f position, World world) {
@@ -31,23 +31,72 @@ public class Player extends Entity {
         velocity.add(acceleration);
         acceleration.zero();
 
-        move(delta);
+        if (!isOnGround) {
+            velocity.y -= 40 * delta;
+        }
+        isOnGround = false;
+
+        if (position.y < 0) {
+            position.y = 300;
+        }
+
+        position.x += velocity.x * delta;
+        collide(new Vector3f(velocity.x, 0, 0), delta);
+
+        position.y += velocity.y * delta;
+        collide(new Vector3f(0, velocity.y, 0), delta);
+
+        position.z += velocity.z * delta;
+        collide(new Vector3f(0, 0, velocity.z), delta);
 
         box.setMin(position);
         box.setMax(dimensions.x + position.x, dimensions.y + position.y, dimensions.z + position.z);
 
         velocity.x *= 0.95f;
         velocity.z *= 0.95f;
-        if (!isOnGround) {
-            velocity.y *= 0.95f;
-        }
     }
 
-    private void move(float delta) {
+    private void collide(Vector3f vel, float dt)
+    {
+        for (int x = (int) (position.x - dimensions.x); x < position.x + dimensions.x; x++)
+            for (int y = (int) (position.y - dimensions.y); y < position.y + 2; y++)
+                for (int z = (int) (position.z - dimensions.z); z < position.z + dimensions.z; z++)
+                {
+                    byte block = world.getBlock(x, y, z);
 
-        position.x += velocity.x * delta;
-        position.y += velocity.y * delta;
-        position.z += velocity.z * delta;
+                    if (block != 0 && BlockID.getBlockData(block).isCollidable)
+                    {
+                        if (vel.y > 0)
+                        {
+                            position.y = y - dimensions.y;
+                            velocity.y = 0;
+                        }
+                        else if (vel.y < 0)
+                        {
+                            isOnGround = true;
+                            position.y = y + dimensions.y + 1;
+                            velocity.y = 0;
+                        }
+
+                        if (vel.x > 0)
+                        {
+                            position.x = x - dimensions.x;
+                        }
+                        else if (vel.x < 0)
+                        {
+                            position.x = x + dimensions.x + 1;
+                        }
+
+                        if (vel.z > 0)
+                        {
+                            position.z = z - dimensions.z;
+                        }
+                        else if (vel.z < 0)
+                        {
+                            position.z = z + dimensions.z + 1;
+                        }
+                    }
+                }
     }
 
     @SuppressWarnings("EmptyMethod")
@@ -85,18 +134,12 @@ public class Player extends Entity {
             acceleration.x += Math.cos(Math.toRadians(rotation.y)) * speed;
             acceleration.z += Math.sin(Math.toRadians(rotation.y)) * speed;
         }
-        if (window.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
-            position.y -= 0.01f;
-        }
-        if (window.isKeyDown(GLFW_KEY_LEFT_ALT)) {
-            position.y += 0.01f;
-        }
     }
 
     public void jump() {
         if (isOnGround) {
             isOnGround = false;
-            acceleration.y += speed * 250f;
+            acceleration.y += speed * 25f;
         }
     }
 
@@ -112,10 +155,8 @@ public class Player extends Entity {
         rotation.x += change.y;
 
         if (rotation.x > BOUND) {
-            System.out.println(rotation.x + " OVER BOUND");
             rotation.x = BOUND;
         } else if(rotation.x < -BOUND) {
-            System.out.println(rotation.x + " UNDER BOUND");
             rotation.x = -BOUND;
         }
 

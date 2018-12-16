@@ -35,7 +35,6 @@ public class Camera {
     public void update() {
         if (entity != null) {
             this.position.set(entity.position);
-            this.position.y += 2;
             this.rotation = entity.rotation;
         }
 
