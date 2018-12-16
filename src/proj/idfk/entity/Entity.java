@@ -12,14 +12,14 @@ public class Entity {
 
     public Entity() {
         this.position = new Vector3f();
-        this.rotation = new Vector3f();
+        this.rotation = new Vector3f(0, 0, 0);
         this.velocity = new Vector3f();
         this.box = new AABBf(position.x, position.y, position.z, 0, 0, 0);
     }
 
     public Entity(Vector3f position, Vector3f rotation) {
         this.position = position;
-        this.rotation = rotation;
+        this.rotation = new Vector3f(0, 0, 0);
         this.velocity = new Vector3f();
         this.box = new AABBf(position.x, position.y, position.z, 0, 0, 0);
     }

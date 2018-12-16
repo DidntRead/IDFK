@@ -21,7 +21,7 @@ public class Player extends Entity {
 
 
     public Player(Config config, Vector3f position, World world) {
-        super(position, new Vector3f(0, 0, 0), new Vector3f(0.8f, 2, 0.5f));
+        super(position, new Vector3f(-30, 0, 0), new Vector3f(0.8f, 2, 0.5f));
         this.config = config;
         this.world = world;
         this.acceleration = new Vector3f();
@@ -85,6 +85,12 @@ public class Player extends Entity {
             acceleration.x += Math.cos(Math.toRadians(rotation.y)) * speed;
             acceleration.z += Math.sin(Math.toRadians(rotation.y)) * speed;
         }
+        if (window.isKeyDown(GLFW_KEY_LEFT_CONTROL)) {
+            position.y -= 0.01f;
+        }
+        if (window.isKeyDown(GLFW_KEY_LEFT_ALT)) {
+            position.y += 0.01f;
+        }
     }
 
     public void jump() {
@@ -97,14 +103,21 @@ public class Player extends Entity {
     private static Vector2f lastMousePosition = new Vector2f();
     private static final float BOUND = 89.9999f;
 
+
+    @SuppressWarnings("SuspiciousNameCombination")
     private void mouseInput(Window window) {
-        Vector2f change = new Vector2f(window.getCursorPosition()).sub(lastMousePosition);
+        Vector2f change = new Vector2f(window.getCursorPosition()).sub(lastMousePosition).mul(config.sensitivity);
 
-        rotation.y += change.x * config.sensitivity;
-        rotation.x += change.y * config.sensitivity;
+        rotation.y += change.x;
+        rotation.x += change.y;
 
-        if (rotation.x > BOUND) rotation.x = BOUND;
-        else if(rotation.x < -BOUND) rotation.x = -BOUND;
+        if (rotation.x > BOUND) {
+            System.out.println(rotation.x + " OVER BOUND");
+            rotation.x = BOUND;
+        } else if(rotation.x < -BOUND) {
+            System.out.println(rotation.x + " UNDER BOUND");
+            rotation.x = -BOUND;
+        }
 
         if (rotation.y > 360) rotation.y = rotation.y - 360f;
         else if (rotation.y < 0) rotation.y = rotation.y + 360f;

@@ -27,4 +27,8 @@ public class Timer {
         lastTime = (float) glfwGetTime();
         return (float) glfwGetTime() - temp;
     }
+
+    public float elapsedWithoutReset() {
+        return (float) glfwGetTime() - lastTime;
+    }
 }

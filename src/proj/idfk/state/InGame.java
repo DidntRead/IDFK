@@ -1,33 +1,35 @@
 package proj.idfk.state;
 
+import org.joml.Vector3f;
 import proj.idfk.Application;
 import proj.idfk.Camera;
 import proj.idfk.callback.KeyCallback;
 import proj.idfk.callback.MouseButtonCallback;
 import proj.idfk.callback.ScrollCallback;
 import proj.idfk.render.MasterRenderer;
-import proj.idfk.util.RayCast;
+import proj.idfk.util.Ray;
+import proj.idfk.util.Timer;
 import proj.idfk.world.BlockID;
 import proj.idfk.world.save.SaveManager;
 import proj.idfk.world.World;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-public class InGame implements GameState, KeyCallback, ScrollCallback, MouseButtonCallback {
+public class InGame implements GameState, KeyCallback, ScrollCallback {
     private final Application app;
     private final SaveManager saveManager;
+    private final Timer breakTimer;
     private World world = null;
-    private RayCast rayCast;
 
     public InGame(Application app, SaveManager saveManager) {
         this.app = app;
+        this.breakTimer = new Timer();
         this.saveManager = saveManager;
     }
 
     @Override
     public void on_enter() {
         this.world = saveManager.getCurrentWorld();
-        this.rayCast = new RayCast(app, world);
         app.getWindow().disableNuklearInput();
         app.getCamera().hookEntity(world.getPlayer());
         app.getRenderer().setInGame(true);
@@ -45,7 +47,22 @@ public class InGame implements GameState, KeyCallback, ScrollCallback, MouseButt
         world.getPlayer().handleInput(app.getWindow());
         world.getPlayer().update(delta);
 
-        rayCast.update();
+        for (Ray ray = new Ray(app.getCamera().position, app.getCamera().rotation); ray.getLength() < 4; ray.step(0.05f)) {
+            int x = Math.round(ray.getEnd().x);
+            int y = Math.round(ray.getEnd().y);
+            int z = Math.round(ray.getEnd().z);
+            byte block = world.getBlock(x, y, z);
+
+            if (block != BlockID.AIR) {
+                if (breakTimer.elapsedWithoutReset() > 0.2f) {
+                    if (app.getWindow().isMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
+                        breakTimer.reset();
+                        world.setBlock(x, y, z, (byte) 0);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -69,17 +86,5 @@ public class InGame implements GameState, KeyCallback, ScrollCallback, MouseButt
     @Override
     public void scrollCallback(float yoffset) {
         world.getPlayer().scroll(yoffset);
-    }
-
-    @Override
-    public void mouseButtonCallback(int x, int y, int button, boolean press) {
-        if (button == GLFW_MOUSE_BUTTON_LEFT && press) {
-            if (rayCast.getSelectedBlock() != null) {
-                //System.out.format("X: %d, Y: %d, Z: %d\n", rayCast.getSelectedBlock().x, rayCast.getSelectedBlock().y, rayCast.getSelectedBlock().z);
-                //world.setBlock(rayCast.getSelectedBlock(), BlockID.AIR);
-            } else {
-                System.out.println("Selected block empty");
-            }
-        }
     }
 }

@@ -41,6 +41,9 @@ public class Chunk implements Disposable {
     }
 
     public byte getBlock(int x, int y, int z) {
+        if (x < 0 || y < 0 || z < 0) {
+            System.out.format("X: %d, Y: %d, Z: %d\n", x, y, z);
+        }
         return this.blocks[getFlatIndex(x, y, z)];
     }
 
@@ -61,12 +64,17 @@ public class Chunk implements Disposable {
         return this.mesh;
     }
 
-    protected final ChunkMesh getMeshWithoutBuilding() {
+    final ChunkMesh getMeshWithoutBuilding() {
         return this.mesh;
     }
 
     public final VectorXZ getPosition() {
         return this.position;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("X: %d, Z: %d", position.x, position.z);
     }
 
     @Override

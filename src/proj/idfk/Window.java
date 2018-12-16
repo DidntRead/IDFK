@@ -333,6 +333,10 @@ public class Window implements Disposable {
         return glfwGetKey(handle, key) == GLFW_PRESS;
     }
 
+    public boolean isMouseButtonDown(int button) {
+        return glfwGetMouseButton(handle, button) == GLFW_PRESS;
+    }
+
     public Vector2i getWindowSize() {
         return this.windowSize;
     }

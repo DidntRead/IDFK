@@ -37,7 +37,7 @@ public class World {
         this.seed = seed;
         this.generator = new NormalGenerator(seed);
         this.chunkMap = new ConcurrentHashMap<>();
-        this.player = new Player(config, new Vector3f(0, getHeight(0, 0), 0), this);
+        this.player = new Player(config, new Vector3f(0, getHeight(0, 0) + 1, 0), this);
     }
 
     public Player getPlayer() {
@@ -87,11 +87,20 @@ public class World {
     }
 
     private VectorXZ getChunkXZ(int x, int z) {
-        return new VectorXZ(x / CHUNK_SIZE, z / CHUNK_SIZE);
+        return new VectorXZ((int)Math.floor(x / (float)CHUNK_SIZE), (int)Math.floor(z / (float)CHUNK_SIZE));
+    }
+
+    private int getBlockCoordinate(int v) {
+        v = v % CHUNK_SIZE;
+        if (v < 0) {
+            return CHUNK_SIZE + v;
+        } else {
+            return v;
+        }
     }
 
     private VectorXZ getBlockXZ(int x, int z) {
-        return new VectorXZ(Math.abs(x % CHUNK_SIZE), Math.abs(z % CHUNK_SIZE));
+        return new VectorXZ(getBlockCoordinate(x), getBlockCoordinate(z));
     }
 
     public byte getBlock(int x, int y, int z) {
@@ -99,12 +108,16 @@ public class World {
             return 0;
         }
         final VectorXZ block = getBlockXZ(x, z);
+        if (block.x < 0 || block.z < 0) {
+            System.out.println("WTF " + block.x + " " + block.z + " " + x + " " + y + " " + z);
+        }
         return getChunk(getChunkXZ(x, z)).getBlock(block.x, y, block.z);
     }
 
     public void setBlock(int x, int y, int z, byte id) {
         final VectorXZ block = getBlockXZ(x, z);
         getChunk(getChunkXZ(x, z)).setBlock(block.x, y, block.z, id);
+        //System.out.format("X: %d, Y: %d, Z: %d, ChunkX: %d, ChunkZ: %d, BlockX: %d, BlockZ: %d\n", x, y, z, getChunkXZ(x, z).x, getChunkXZ(x, z).z, block.x, block.z);
     }
 
     public void setBlock(Vector3i pos, byte id) {
@@ -116,7 +129,7 @@ public class World {
         return getChunk(getChunkXZ(worldX, worldZ));
     }
 
-    private int getHeight(int x, int z) {
+    public int getHeight(int x, int z) {
         final VectorXZ chunk = getChunkXZ(x, z);
         final VectorXZ block = getBlockXZ(x, z);
 
@@ -124,11 +137,11 @@ public class World {
 
         for (int i = CHUNK_HEIGHT -1; i >= 0; i--) {
             if (ch.getBlock(block.x, i, block.z) != BlockID.AIR) {
-                return i + 1;
+                return i;
             }
         }
 
-        return CHUNK_HEIGHT + 1;
+        return CHUNK_HEIGHT;
     }
 
     public String getName() {

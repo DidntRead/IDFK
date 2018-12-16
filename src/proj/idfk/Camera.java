@@ -40,10 +40,10 @@ public class Camera {
         }
 
         viewMatrix = Matrix.makeViewMatrix(this);
-        viewMatrix.invert(inverseViewMatrix);
-        projectionMatrix.invert(inverseProjectionMatrix);
         projViewMatrix.set(projectionMatrix).mul(viewMatrix);
         frustrum.set(projViewMatrix, false);
+        viewMatrix.invert(inverseViewMatrix);
+        projectionMatrix.invert(inverseProjectionMatrix);
     }
 
     public void hookEntity(final Entity ent) {
@@ -72,6 +72,10 @@ public class Camera {
 
     public Vector3f getPosition() {
         return this.position;
+    }
+
+    public Vector3f getRotation() {
+        return this.rotation;
     }
 
     public FrustumIntersection getFrustrum() {
