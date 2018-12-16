@@ -21,7 +21,7 @@ public class Player extends Entity {
 
 
     public Player(Config config, Vector3f position, World world) {
-        super(position, new Vector3f(-30, 0, 0), new Vector3f(0.8f, 2, 0.5f));
+        super(position, new Vector3f(-30, 0, 0), new Vector3f(0.3f, 0.1f, 0.3f));
         this.config = config;
         this.world = world;
         this.acceleration = new Vector3f();
@@ -59,7 +59,7 @@ public class Player extends Entity {
     private void collide(Vector3f vel, float dt)
     {
         for (int x = (int) (position.x - dimensions.x); x < position.x + dimensions.x; x++)
-            for (int y = (int) (position.y - dimensions.y); y < position.y + 2; y++)
+            for (int y = (int) (position.y - dimensions.y); y < position.y + 1.7f; y++)
                 for (int z = (int) (position.z - dimensions.z); z < position.z + dimensions.z; z++)
                 {
                     byte block = world.getBlock(x, y, z);
