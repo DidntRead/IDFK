@@ -21,7 +21,7 @@ public class ChunkRenderer implements Disposable {
     public ChunkRenderer() {
         this.shader = new ChunkShader();
         this.meshList = new ArrayList<>();
-        this.blocksTexture = new TextureArray("textures/block/", 5);
+        this.blocksTexture = new TextureArray("textures/block/", 6);
         shader.loadBlockTextureArrayHandle(blocksTexture.getTextureHandle());
     }
 

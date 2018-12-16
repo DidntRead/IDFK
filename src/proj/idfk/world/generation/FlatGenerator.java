@@ -9,9 +9,10 @@ public class FlatGenerator implements ChunkGenerator {
     public void generate(Chunk chunk) {
         for (int x = 0; x < Constants.CHUNK_SIZE; x++) {
             for (int z = 0; z < Constants.CHUNK_SIZE; z++) {
-                chunk.setBlock(x, 0, z, BlockID.STONE);
+                chunk.setBlock(x, 0, z, BlockID.BEDROCK);
                 chunk.setBlock(x, 1, z, BlockID.DIRT);
-                chunk.setBlock(x, 2, z, BlockID.GRASS);
+                chunk.setBlock(x, 2, z, BlockID.DIRT);
+                chunk.setBlock(x, 3, z, BlockID.GRASS);
             }
         }
     }

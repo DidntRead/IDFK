@@ -23,9 +23,10 @@ public class NormalGenerator implements ChunkGenerator {
                 chunk.setBlock(x, height, z, BlockID.GRASS);
                 chunk.setBlock(x, height - 1, z, BlockID.DIRT);
                 chunk.setBlock(x, height - 2, z, BlockID.DIRT);
-                for (int i = height - 3; i >= 0; i--) {
+                for (int i = height - 3; i > 0; i--) {
                     chunk.setBlock(x, i, z, BlockID.STONE);
                 }
+                chunk.setBlock(x, 0, z, BlockID.BEDROCK);
             }
         }
     }

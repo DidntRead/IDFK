@@ -36,7 +36,7 @@ public class Player extends Entity {
         }
         isOnGround = false;
 
-        if (position.y < 0) {
+        if (position.y < -100) {
             position.y = 300;
         }
 
@@ -48,9 +48,6 @@ public class Player extends Entity {
 
         position.z += velocity.z * delta;
         collide(new Vector3f(0, 0, velocity.z), delta);
-
-        box.setMin(position);
-        box.setMax(dimensions.x + position.x, dimensions.y + position.y, dimensions.z + position.z);
 
         velocity.x *= 0.95f;
         velocity.z *= 0.95f;

@@ -9,6 +9,7 @@ import proj.idfk.Config;
 import proj.idfk.player.Player;
 import proj.idfk.util.VectorXZ;
 import proj.idfk.world.generation.ChunkGenerator;
+import proj.idfk.world.generation.FlatGenerator;
 import proj.idfk.world.generation.NormalGenerator;
 
 import java.util.*;
@@ -29,6 +30,7 @@ public class World {
         this.seed = seed;
         this.player = new Player(config, playerPosition, this);
         this.generator = new NormalGenerator(seed);
+        //this.generator = new FlatGenerator();
         this.chunkMap = new ConcurrentHashMap<>();
     }
 
@@ -36,6 +38,7 @@ public class World {
         this.name = name;
         this.seed = seed;
         this.generator = new NormalGenerator(seed);
+        //this.generator = new FlatGenerator();
         this.chunkMap = new ConcurrentHashMap<>();
         this.player = new Player(config, new Vector3f(0, getHeight(0, 0) + 1, 0), this);
     }

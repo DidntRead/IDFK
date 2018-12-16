@@ -47,13 +47,13 @@ public class InGame implements GameState, KeyCallback, ScrollCallback {
         world.getPlayer().handleInput(app.getWindow());
         world.getPlayer().update(delta);
 
-        for (Ray ray = new Ray(app.getCamera().position, app.getCamera().rotation); ray.getLength() < 4; ray.step(0.05f)) {
-            int x = Math.round(ray.getEnd().x);
-            int y = Math.round(ray.getEnd().y);
-            int z = Math.round(ray.getEnd().z);
+        for (Ray ray = new Ray(app.getCamera().position, app.getCamera().rotation); ray.getLength() < 6; ray.step(0.05f)) {
+            int x = (int) ray.getEnd().x;
+            int y = (int) ray.getEnd().y;
+            int z = (int) ray.getEnd().z;
             byte block = world.getBlock(x, y, z);
 
-            if (block != BlockID.AIR) {
+            if (block != BlockID.AIR && block != BlockID.BEDROCK) {
                 if (breakTimer.elapsedWithoutReset() > 0.2f) {
                     if (app.getWindow().isMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
                         breakTimer.reset();
