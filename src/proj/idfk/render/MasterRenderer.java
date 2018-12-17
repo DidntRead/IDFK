@@ -13,15 +13,15 @@ import static org.lwjgl.opengl.GL45.*;
 public class MasterRenderer implements Disposable {
     private final Application app;
     private final NuklearRenderer nuklearRenderer;
-    private final GUIRenderer guiRenderer;
     private final ChunkRenderer chunkRenderer;
+    private final GUIRenderer guiRenderer;
     private boolean inGame = false;
 
     public MasterRenderer(Application app) {
         this.app = app;
         this.nuklearRenderer = new NuklearRenderer(app);
         this.chunkRenderer = new ChunkRenderer();
-        this.guiRenderer = new GUIRenderer();
+        this.guiRenderer = new GUIRenderer(app);
 
         glBlendEquation(GL_FUNC_ADD);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -36,7 +36,7 @@ public class MasterRenderer implements Disposable {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         if (inGame) {
             chunkRenderer.render(camera);
-            //guiRenderer.render();
+            guiRenderer.render();
         } else {
             nuklearRenderer.render();
         }
@@ -58,13 +58,11 @@ public class MasterRenderer implements Disposable {
         this.inGame = v;
         if (v) {
             app.getWindow().setCursorMode(false);
-            glDisable(GL_BLEND);
             glDisable(GL_SCISSOR_TEST);
             glEnable(GL_DEPTH_TEST);
             glEnable(GL_CULL_FACE);
         } else {
             app.getWindow().setCursorMode(true);
-            glEnable(GL_BLEND);
             glDisable(GL_CULL_FACE);
             glDisable(GL_DEPTH_TEST);
             glEnable(GL_SCISSOR_TEST);
