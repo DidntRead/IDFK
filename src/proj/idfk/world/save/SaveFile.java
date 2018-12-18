@@ -3,18 +3,24 @@ package proj.idfk.world.save;
 import org.joml.Vector3f;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
+import proj.idfk.util.VectorXZ;
 import proj.idfk.world.World;
+import proj.idfk.world.event.PlayerDigEvent;
 
-import java.io.IOException;
+import java.io.*;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
 
 import static java.nio.file.StandardOpenOption.*;
 
 public class SaveFile {
     private boolean isValid;
     private String name;
+    private Map<VectorXZ, List<PlayerDigEvent>> events;
     private Long seed;
     private static final int saveSize = 5 //HEADER
     + 65 // Name
@@ -35,6 +41,54 @@ public class SaveFile {
                     world.position(70);
                     this.seed = world.getLong();
                     this.playerPosition = new Vector3f(world.getFloat(), world.getFloat(), world.getFloat());
+                    ObjectInputStream in = new ObjectInputStream(new InputStream() {
+                        @Override
+                        public int read(byte[] b, int off, int len) {
+                            if (len <= 0) {
+                                return 0;
+                            }
+                            for (int x = off; x < off + len; x++) {
+                                b[x] = world.get();
+                                if (world.position() > world.limit()) {
+                                    return x - off;
+                                }
+                            }
+                            return len;
+                        }
+
+                        @Override
+                        public int read(byte[] b) throws IOException, NullPointerException {
+                            if (b == null) {
+                                throw new NullPointerException();
+                            }
+                            if (world.position() > world.limit()) {
+                                return  -1;
+                            }
+                            if (b.length <= 0) {
+                                return 0;
+                            }
+                            for (int i = 0; i < b.length; i++) {
+                                b[i] = world.get();
+                                if (world.position() > world.limit()) {
+                                    return i;
+                                }
+                            }
+                            return b.length;
+                        }
+
+                        @Override
+                        public int read() throws IOException {
+                            if (world.position() > world.limit()) {
+                                return -1;
+                            }
+                            return world.get();
+                        }
+                    });
+                    try {
+                        events = (Map<VectorXZ, List<PlayerDigEvent>>) in.readObject();
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
                     isValid = true;
                 } else {
                     isValid = false;
@@ -50,7 +104,10 @@ public class SaveFile {
     public static void saveWorld(World world, Path saveDirectory) {
         try {
             FileChannel channel = FileChannel.open(saveDirectory.resolve(world.getName() + ".wld"), WRITE, CREATE, TRUNCATE_EXISTING);
-            ByteBuffer worldBuffer = MemoryUtil.memAlloc(saveSize);
+            ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
+            ObjectOutputStream out = new ObjectOutputStream(byteOutput);
+            out.writeObject(world.getEventMap());
+            ByteBuffer worldBuffer = MemoryUtil.memAlloc(saveSize + byteOutput.size());
             worldBuffer.put("*WLD*".getBytes());
             MemoryUtil.memUTF8(world.getName(), true, worldBuffer, 5);
             worldBuffer.position(70);
@@ -58,6 +115,17 @@ public class SaveFile {
             worldBuffer.putFloat(world.getPlayer().position.x);
             worldBuffer.putFloat(world.getPlayer().position.y);
             worldBuffer.putFloat(world.getPlayer().position.z);
+            OutputStream stream = new OutputStream() {
+                @Override
+                public void write(int b) throws IOException {
+                    worldBuffer.put((byte) b);
+                }
+            };
+            byteOutput.writeTo(stream);
+            byteOutput.close();
+            out.close();
+            stream.close();
+            //out.writeObject(world.getEventMap());
             worldBuffer.flip();
             channel.write(worldBuffer);
             channel.close();
@@ -81,5 +149,9 @@ public class SaveFile {
 
     public Vector3f getPlayerPosition() {
         return this.playerPosition;
+    }
+
+    public Map<VectorXZ, List<PlayerDigEvent>> getEvents() {
+        return this.events;
     }
 }

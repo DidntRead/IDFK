@@ -47,6 +47,8 @@ public class InGame implements GameState, KeyCallback, ScrollCallback {
         world.getPlayer().handleInput(app.getWindow());
         world.getPlayer().update(delta);
 
+        Vector3f lastPosition = new Vector3f();
+
         for (Ray ray = new Ray(app.getCamera().position, app.getCamera().rotation); ray.getLength() < 6; ray.step(0.05f)) {
             int x = (int) ray.getEnd().x;
             int y = (int) ray.getEnd().y;
@@ -57,11 +59,16 @@ public class InGame implements GameState, KeyCallback, ScrollCallback {
                 if (breakTimer.elapsedWithoutReset() > 0.2f) {
                     if (app.getWindow().isMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
                         breakTimer.reset();
-                        world.setBlock(x, y, z, (byte) 0);
+                        world.digEvent(x, y, z, BlockID.AIR, false);
+                        break;
+                    } else if (app.getWindow().isMouseButtonDown(GLFW_MOUSE_BUTTON_RIGHT)) {
+                        breakTimer.reset();
+                        world.digEvent((int)lastPosition.x, (int)lastPosition.y, (int)lastPosition.z, BlockID.DIRT, true);
                         break;
                     }
                 }
             }
+            lastPosition.set(ray.getEnd());
         }
     }
 
@@ -76,9 +83,6 @@ public class InGame implements GameState, KeyCallback, ScrollCallback {
         if (action == GLFW_PRESS) {
             if (key == GLFW_KEY_ESCAPE) {
                 app.getStateManager().push(GameStateManager.GameState.PauseMenu);
-            }
-            if (key == GLFW_KEY_SPACE) {
-                world.getPlayer().jump();
             }
         }
     }

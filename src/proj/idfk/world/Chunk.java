@@ -3,7 +3,10 @@ package proj.idfk.world;
 import org.joml.AABBf;
 import proj.idfk.util.Disposable;
 import proj.idfk.util.VectorXZ;
+import proj.idfk.world.event.PlayerDigEvent;
 import proj.idfk.world.generation.ChunkGenerator;
+
+import java.util.List;
 
 import static proj.idfk.world.Constants.CHUNK_SIZE;
 
@@ -15,13 +18,18 @@ public class Chunk implements Disposable {
     private byte[] blocks;
     private boolean dirty = true;
 
-    protected Chunk(VectorXZ position, ChunkGenerator generator) {
+    protected Chunk(VectorXZ position, ChunkGenerator generator, List<PlayerDigEvent> events) {
         this.position = position;
         this.mesh = new ChunkMesh();
         this.aabb = new AABBf(position.x * CHUNK_SIZE, 0, position.z * CHUNK_SIZE, (position.x + 1) * CHUNK_SIZE, 16, (position.z + 1) * CHUNK_SIZE);
         this.meshBuilder = new ChunkMeshBuilder(this);
         this.blocks = new byte[Constants.CHUNK_VOLUME];
         generator.generate(this);
+        if (events != null) {
+            events.iterator().forEachRemaining(event -> {
+                blocks[getFlatIndex(event.position.x, event.position.y, event.position.z)] = event.blockID;
+            });
+        }
         //TODO generate - maybe in a thread pool
     }
 

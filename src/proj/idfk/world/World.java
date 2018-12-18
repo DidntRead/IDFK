@@ -8,8 +8,8 @@ import proj.idfk.Camera;
 import proj.idfk.Config;
 import proj.idfk.player.Player;
 import proj.idfk.util.VectorXZ;
+import proj.idfk.world.event.PlayerDigEvent;
 import proj.idfk.world.generation.ChunkGenerator;
-import proj.idfk.world.generation.FlatGenerator;
 import proj.idfk.world.generation.NormalGenerator;
 
 import java.util.*;
@@ -24,14 +24,16 @@ public class World {
     private final Player player;
     private final ChunkGenerator generator;
     private final Map<VectorXZ, Chunk> chunkMap;
+    private final Map<VectorXZ, List<PlayerDigEvent>> eventMap;
 
-    public World(String name, Long seed, Config config, Vector3f playerPosition) {
+    public World(String name, Long seed, Config config, Vector3f playerPosition, Map<VectorXZ, List<PlayerDigEvent>> eventMap) {
         this.name = name;
         this.seed = seed;
         this.player = new Player(config, playerPosition, this);
         this.generator = new NormalGenerator(seed);
         //this.generator = new FlatGenerator();
         this.chunkMap = new ConcurrentHashMap<>();
+        this.eventMap = eventMap;
     }
 
     public World(String name, Long seed, Config config) {
@@ -40,6 +42,7 @@ public class World {
         this.generator = new NormalGenerator(seed);
         //this.generator = new FlatGenerator();
         this.chunkMap = new ConcurrentHashMap<>();
+        this.eventMap = new HashMap<>();
         this.player = new Player(config, new Vector3f(0, getHeight(0, 0) + 1, 0), this);
     }
 
@@ -50,7 +53,7 @@ public class World {
     private Chunk getChunk(VectorXZ position) {
         Chunk ch = chunkMap.get(position);
         if (ch == null) {
-            ch = new Chunk(position, generator);
+            ch = new Chunk(position, generator, eventMap.get(position));
             chunkMap.put(position, ch);
         }
         return ch;
@@ -117,10 +120,34 @@ public class World {
         return getChunk(getChunkXZ(x, z)).getBlock(block.x, y, block.z);
     }
 
+    public void digEvent(int x, int y, int z, byte blockID, boolean place) {
+        final VectorXZ chunk = getChunkXZ(x, z);
+        final VectorXZ block = getBlockXZ(x, z);
+        List<PlayerDigEvent> events = eventMap.get(chunk);
+        if (events == null) {
+            events = new ArrayList<>();
+            eventMap.put(chunk, events);
+        }
+
+        boolean handled = false;
+        Iterator<PlayerDigEvent> it = events.iterator();
+        while (it.hasNext()) {
+            PlayerDigEvent ev = it.next();
+            if (ev.position.x == x && ev.position.y == y && ev.position.z == z) {
+                ev.blockID = blockID;
+                handled = true;
+                break;
+            }
+        }
+        if (!handled) {
+            events.add(new PlayerDigEvent(new Vector3i(block.x, y, block.z), blockID));
+        }
+        getChunk(chunk).setBlock(block.x, y, block.z, blockID);
+    }
+
     public void setBlock(int x, int y, int z, byte id) {
         final VectorXZ block = getBlockXZ(x, z);
         getChunk(getChunkXZ(x, z)).setBlock(block.x, y, block.z, id);
-        //System.out.format("X: %d, Y: %d, Z: %d, ChunkX: %d, ChunkZ: %d, BlockX: %d, BlockZ: %d\n", x, y, z, getChunkXZ(x, z).x, getChunkXZ(x, z).z, block.x, block.z);
     }
 
     public void setBlock(Vector3i pos, byte id) {
@@ -145,6 +172,10 @@ public class World {
         }
 
         return CHUNK_HEIGHT;
+    }
+
+    public Map<VectorXZ, List<PlayerDigEvent>> getEventMap() {
+        return this.eventMap;
     }
 
     public String getName() {

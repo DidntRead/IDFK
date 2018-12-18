@@ -69,7 +69,7 @@ public class SaveManager {
     public boolean loadWorld(int index) {
         SaveFile saveFile = new SaveFile(worlds.get(index), saveDirectory);
         if (saveFile.isValid()) {
-            this.current = new World(saveFile.getName(), saveFile.getSeed(), app.getConfig(), saveFile.getPlayerPosition());
+            this.current = new World(saveFile.getName(), saveFile.getSeed(), app.getConfig(), saveFile.getPlayerPosition(), saveFile.getEvents());
             return true;
         } else {
             return false;

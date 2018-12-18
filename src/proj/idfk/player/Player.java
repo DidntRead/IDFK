@@ -131,6 +131,9 @@ public class Player extends Entity {
             acceleration.x += Math.cos(Math.toRadians(rotation.y)) * speed;
             acceleration.z += Math.sin(Math.toRadians(rotation.y)) * speed;
         }
+        if (window.isKeyDown(GLFW_KEY_SPACE)) {
+            jump();
+        }
     }
 
     public void jump() {

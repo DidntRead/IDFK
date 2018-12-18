@@ -1,8 +1,8 @@
 package proj.idfk.util;
 
-import java.util.Vector;
+import java.io.Serializable;
 
-public class VectorXZ {
+public class VectorXZ implements Serializable {
     public int x;
     public int z;
 
