@@ -4,12 +4,10 @@ import proj.idfk.Camera;
 import proj.idfk.shader.ChunkShader;
 import proj.idfk.texture.TextureArray;
 import proj.idfk.util.Disposable;
-import proj.idfk.util.VectorXZ;
 import proj.idfk.world.Chunk;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static org.lwjgl.opengl.GL45.*;
 
@@ -21,7 +19,7 @@ public class ChunkRenderer implements Disposable {
     public ChunkRenderer() {
         this.shader = new ChunkShader();
         this.meshList = new ArrayList<>();
-        this.blocksTexture = new TextureArray("textures/block/", 6);
+        this.blocksTexture = new TextureArray("textures/block/", 12);
         shader.loadBlockTextureArrayHandle(blocksTexture.getTextureHandle());
     }
 
