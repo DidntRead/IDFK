@@ -52,6 +52,9 @@ public class Chunk implements Disposable {
         if (x < 0 || y < 0 || z < 0) {
             System.out.format("X: %d, Y: %d, Z: %d\n", x, y, z);
         }
+        if (getFlatIndex(x, y, z) == 65536) {
+            System.out.format("X: %d, Y: %d, Z: %d\n", x, y, z);
+        }
         return this.blocks[getFlatIndex(x, y, z)];
     }
 
