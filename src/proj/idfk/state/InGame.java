@@ -4,14 +4,13 @@ import org.joml.Vector3f;
 import proj.idfk.Application;
 import proj.idfk.Camera;
 import proj.idfk.callback.KeyCallback;
-import proj.idfk.callback.MouseButtonCallback;
 import proj.idfk.callback.ScrollCallback;
 import proj.idfk.render.MasterRenderer;
 import proj.idfk.util.Ray;
 import proj.idfk.util.Timer;
 import proj.idfk.world.BlockID;
-import proj.idfk.world.save.SaveManager;
 import proj.idfk.world.World;
+import proj.idfk.world.save.SaveManager;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -63,7 +62,7 @@ public class InGame implements GameState, KeyCallback, ScrollCallback {
                         break;
                     } else if (app.getWindow().isMouseButtonDown(GLFW_MOUSE_BUTTON_RIGHT)) {
                         breakTimer.reset();
-                        world.digEvent((int)lastPosition.x, (int)lastPosition.y, (int)lastPosition.z, BlockID.DIRT, true);
+                        world.digEvent((int)lastPosition.x, (int)lastPosition.y, (int)lastPosition.z, BlockID.CRAFTING_TABLE, true);
                         break;
                     }
                 }

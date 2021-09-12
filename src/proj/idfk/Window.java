@@ -11,7 +11,10 @@ import org.lwjgl.opengl.GLUtil;
 import org.lwjgl.system.Callback;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
-import proj.idfk.callback.*;
+import proj.idfk.callback.CharCallback;
+import proj.idfk.callback.KeyCallback;
+import proj.idfk.callback.MouseButtonCallback;
+import proj.idfk.callback.ScrollCallback;
 import proj.idfk.util.Disposable;
 import proj.idfk.util.Resolution;
 
@@ -19,7 +22,6 @@ import java.nio.DoubleBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.nuklear.Nuklear.*;
@@ -258,27 +260,19 @@ public class Window implements Disposable {
     }
 
     public List<Resolution> getUsableResolutions() {
-        final Resolution[] resolutions = Resolution.values();
         List<Resolution> ret = new ArrayList<>();
 
-        GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        final int width = Objects.requireNonNull(vidMode).width();
-        final int height = vidMode.height();
-
-        for (Resolution res : resolutions) {
-            if (res.width <= width && res.height <= height) {
+        glfwGetVideoModes(glfwGetPrimaryMonitor()).forEach(mode -> {
+            Resolution res = new Resolution(mode.width(), mode.height());
+            if (!ret.contains(res)) {
                 ret.add(res);
             }
-        }
+        });
 
         return ret;
     }
 
     public void applySettings(Config config) {
-        if (config.width != this.windowSize.x || config.height != this.windowSize.y) {
-            glfwSetWindowSize(handle, config.width, config.height);
-        }
-
         if (config.vsync) {
             glfwSwapInterval(1);
         } else {

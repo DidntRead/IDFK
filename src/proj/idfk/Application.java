@@ -4,14 +4,9 @@ import proj.idfk.render.MasterRenderer;
 import proj.idfk.state.GameStateManager;
 import proj.idfk.util.Disposable;
 import proj.idfk.util.Timer;
-import proj.idfk.util.VectorXZ;
-import proj.idfk.world.Chunk;
-import proj.idfk.world.World;
-import proj.idfk.world.generation.NormalGenerator;
 import proj.idfk.world.save.SaveManager;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 
 public class Application implements Disposable {
     private boolean debug;
