@@ -1,0 +1,28 @@
+{
+  "build": "nightly",
+  "mode": "zip",
+  "selectedAddons": [
+    "joml"
+  ],
+  "platform": [
+    "windows",
+    "windows-x86"
+  ],
+  "descriptions": false,
+  "compact": false,
+  "hardcoded": false,
+  "javadoc": false,
+  "includeJSON": true,
+  "source": false,
+  "osgi": false,
+  "language": "groovy",
+  "contents": [
+    "lwjgl",
+    "lwjgl-assimp",
+    "lwjgl-glfw",
+    "lwjgl-nuklear",
+    "lwjgl-openal",
+    "lwjgl-opengl",
+    "lwjgl-stb"
+  ]
+}

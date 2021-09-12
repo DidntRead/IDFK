@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component LANGUAGE_LEVEL="JDK_15" inherit-compiler-output="true" jdk="15" jdk_type="JavaSDK">
+	<output-test url="file://$MODULE_DIR$/out/test/IDFK"/>
+	<exclude-output/>
+	<contentEntry url="file://$MODULE_DIR$"/>
+	<levels>
+		<level name="lwjgl-3.2" value="project"/>
+	</levels>
+</component>
