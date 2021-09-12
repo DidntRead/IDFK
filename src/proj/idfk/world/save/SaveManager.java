@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.zip.CRC32C;
+import java.util.zip.CRC32;
 
 public class SaveManager {
     public final Path saveDirectory;
@@ -80,7 +80,7 @@ public class SaveManager {
         worlds.add(name);
         long seedLong;
         if (seed.length() != 0) {
-            CRC32C crc = new CRC32C();
+            CRC32 crc = new CRC32();
             crc.update(seed.getBytes());
             seedLong = crc.getValue();
         } else {
